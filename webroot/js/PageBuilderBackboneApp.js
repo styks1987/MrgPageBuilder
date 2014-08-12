@@ -44,6 +44,16 @@ B.Editor.View = Backbone.View.extend({
 		console.log('choose module');
 		value = $(e.currentTarget).val();
 		console.log(value);
+		this.show_module(value);
+	},
+	set_module : function (value, data) {
+		this.undelegateEvents();
+		console.log(this.$el.find('.module'));
+		this.$el.find('.module option[value="'+value+'"]').prop('selected', true);
+		this.delegateEvents();
+		this.show_module(value,data);
+	},
+	show_module : function (value, data) {
 		switch(value){
 			case 'quick_links':
 				if (typeof quickLinkColumnsView == 'undefined') {
@@ -51,6 +61,9 @@ B.Editor.View = Backbone.View.extend({
 					quickLinkColumnsView = new B.Editor.View.QuickLinkColumns({collection:quickLinkColumnList, el:'#input_region'});
 				}else{
 					quickLinkColumnsView.setElement('#input_region');
+				}
+				if (typeof data != 'undefined') {
+					quickLinkColumnList.reset(data);
 				}
 				quickLinkColumnsView.render();
 				break;
@@ -61,6 +74,9 @@ B.Editor.View = Backbone.View.extend({
 				}else{
 					quoteView.setElement('#input_region');
 				}
+				if (typeof data != 'undefined') {
+					quoteModel.set(data);
+				}
 				quoteView.render();
 				break;
 			case 'featured':
@@ -69,6 +85,9 @@ B.Editor.View = Backbone.View.extend({
 					featuredView = new B.Editor.View.Featured({model:featuredModel, el:'#input_region'});
 				}else{
 					featuredView.setElement('#input_region');
+				}
+				if (typeof data != 'undefined') {
+					featuredModel.set(data);
 				}
 				featuredView.render();
 				break;
@@ -79,6 +98,9 @@ B.Editor.View = Backbone.View.extend({
 				}else{
 					paragraphView.setElement('#input_region');
 				}
+				if (typeof data != 'undefined') {
+					paragraphModel.set(data);
+				}
 				paragraphView.render();
 				break;
 			case 'paragraph_image':
@@ -88,6 +110,9 @@ B.Editor.View = Backbone.View.extend({
 				}else{
 					paragraphImageView.setElement('#input_region');
 				}
+				if (typeof data != 'undefined') {
+					paragraphImageModel.set(data);
+				}
 				paragraphImageView.render();
 				break;
 		}
@@ -96,10 +121,8 @@ B.Editor.View = Backbone.View.extend({
 
 	// Save the data for later if the file ever needs to be edited
 	save_view_model : function (model) {
-		model.set('model_json', JSON.stringify(model.toJSON()));
-	},
-	save_view_collection : function (collection){
-		collection.set(this.save_view_model(collection));
+		delete model.attributes.model_json;
+		model.set('model_json', JSON.stringify(model.attributes));
 	},
 	// When the user finishes and wants to insert it into the page
 	render_to_preview: function (html) {
@@ -173,23 +196,31 @@ B.Output.View = Backbone.View.extend({
 		},
 		// Insert the HTML into the page
 		insert_html : function (preview_html){
-			console.log(preview_html);
 			this.$el.empty();
-			$(this.insert_location).before(preview_html);
+			if (this.is_edit) {
+				console.log('editing');
+				// if we are editing we want to
+				// replace instead of append
+				$(this.current_block).remove();
+				$(this.insert_location).after(preview_html);
+			}else{
+				console.log('not edit');
+				$(this.insert_location).before(preview_html);
+			}
 
 			this.hide_dropzones();
 			this.save();
 			this.show_dropzones();
 		},
 		edit_content : function (e){
+			this.is_edit = true;
 			// Needs to replace existing content
-			//this.insert_location = $(e.currentTarget).closest('.output_toolbar_wrapper');
-
-			block = $(e.currentTarget).closest('.output_toolbar_wrapper').next('.block');
-			console.log(block);
-			console.log($(block).find('[name="model"]'));
-			data = $.parseJSON($(block).find('[name="model"]').val())
-			console.log(data);
+			this.current_block = $(e.currentTarget).closest('.output_toolbar_wrapper').next('.block');
+			block_type = $(this.current_block).data('block_type');
+			data = JSON.parse($(this.current_block).find('[name="model"]').val());
+			delete data.model_json;
+			this.show_editor(e);
+			editorView.set_module(block_type, data);
 		},
 		delete_content : function (e) {
 			console.log($(e.currentTarget).closest('.output_toolbar_wrapper'));
@@ -316,7 +347,6 @@ B.Editor.View.Featured = B.Editor.View.extend({
 			editorFeaturedImage.render();
 		},
 		finished_upload : function (file, response) {
-			console.log(response);
 			this.model.set('background_image', '/uploads/featured_images/'+response.target_filename);
 			this.render();
 		},
@@ -412,7 +442,6 @@ B.Output.Model.QuickLink				= B.Output.Model.extend({});
 			}
 		},
 		render_output : function () {
-			this.save_view_collection(quickLinkColumnsView.collection)
 			quickLinkColumnsModelOutput = new B.Output.Collection.QuickLinkColumns();
 			quickLinkColumnsModelOutput.reset(quickLinkColumnsView.collection.toJSON());
 			quickLinkColumnsViewOutput = new B.Output.View.QuickLinkColumns({collection:quickLinkColumnsModelOutput});
@@ -513,7 +542,7 @@ B.Output.Model.QuickLink				= B.Output.Model.extend({});
 		initialize:function(){},
 		template : _.template($('#OutputQuickLinkColumns').html()),
 		render : function () {
-			this.$el.html(this.template());
+			this.$el.html(this.template({model_json:JSON.stringify(this.collection.toJSON())}));
 			this.add_all();
 			return this.$el;
 		},
