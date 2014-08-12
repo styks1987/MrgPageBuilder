@@ -41,6 +41,7 @@
 
 <script type="text/template" id="OutputQuickLinkColumns">
 	<div class="quick_links block" data-block_type="quick_links">
+		<input type='hidden' name="model" value='<%= model_json %>' />
 		<div class="container">
 			<h1>Quick Links</h1>
 			<div class="row">

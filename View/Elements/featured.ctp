@@ -70,6 +70,7 @@
 
 <script type="text/template" id="FeaturedOutput">
 	<div class="hero main future_students block" data-type="featured">
+		<input type='hidden' name="model" value='<%= model_json %>' />
 		<div class="bg" style="background-image:url(<%= background_image %>);"></div>
 		<div class="cont">
 			<div class="container">

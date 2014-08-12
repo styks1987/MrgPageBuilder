@@ -54,6 +54,7 @@
 
 <script type="text/template" id="ParagraphImageOutput">
 	<div class="paragraph_image container block" data-block_type="paragraph_image">
+		<input type='hidden' name="model" value='<%= model_json %>' />
 		<div class="row">
 			<% if(image_position == 'left'){ %>
 				<div class="col-sm-6 col-md-6"><a href="<%= image_link %>"><img src="<%= background_image %>" alt="<%= image_alt_text %>"></a></div>

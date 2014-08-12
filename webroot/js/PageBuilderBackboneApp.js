@@ -93,6 +93,14 @@ B.Editor.View = Backbone.View.extend({
 		}
 	},
 
+
+	// Save the data for later if the file ever needs to be edited
+	save_view_model : function (model) {
+		model.set('model_json', JSON.stringify(model.toJSON()));
+	},
+	save_view_collection : function (collection){
+		collection.set(this.save_view_model(collection));
+	},
 	// When the user finishes and wants to insert it into the page
 	render_to_preview: function (html) {
 		//console.log(output);
@@ -174,7 +182,14 @@ B.Output.View = Backbone.View.extend({
 			this.show_dropzones();
 		},
 		edit_content : function (e){
+			// Needs to replace existing content
+			//this.insert_location = $(e.currentTarget).closest('.output_toolbar_wrapper');
 
+			block = $(e.currentTarget).closest('.output_toolbar_wrapper').next('.block');
+			console.log(block);
+			console.log($(block).find('[name="model"]'));
+			data = $.parseJSON($(block).find('[name="model"]').val())
+			console.log(data);
 		},
 		delete_content : function (e) {
 			console.log($(e.currentTarget).closest('.output_toolbar_wrapper'));
@@ -203,7 +218,9 @@ B.Editor.View.ParagraphImage = B.Editor.View.extend({
 		featuredImageView.render();
 	},
 	render_paragraph_image_output : function () {
-		console.log('paragraph_image render');
+
+		this.save_view_model(paragraphImageModel);
+
 		paragraphImageModelOutput = new B.Output.Model.ParagraphImage();
 		paragraphImageModelOutput.set(paragraphImageModel.toJSON());
 		paragraphImageModelViewOutput = new B.Output.View.ParagraphImage({model:paragraphImageModelOutput});
@@ -236,10 +253,11 @@ B.Editor.View.Paragraph = B.Editor.View.extend({
 	},
 	template : _.template($('#Paragraph').html()),
 	render:function () {
+		this.model.set('model_json', JSON.stringify(this.model.toJSON()));
 		this.$el.html(this.template(this.model.attributes))
 	},
 	render_paragraph_output : function () {
-		console.log('paragraph render');
+		this.save_view_model(paragraphModel);
 		paragraphModelOutput = new B.Output.Model.Paragraph();
 		paragraphModelOutput.set(paragraphModel.toJSON());
 		paragraphModelViewOutput = new B.Output.View.Paragraph({model:paragraphModelOutput});
@@ -276,6 +294,7 @@ B.Editor.View.Featured = B.Editor.View.extend({
 		featuredImageView.render();
 	},
 	render_output : function () {
+		this.save_view_model(featuredModel);
 		featuredModelOutput = new B.Output.Model.Featured();
 		featuredModelOutput.set(featuredModel.toJSON());
 		featuredModelViewOutput = new B.Output.View.Featured({model:featuredModelOutput});
@@ -332,7 +351,7 @@ B.Editor.View.Quote = B.Editor.View.extend({
 		this.$el.html(this.template(this.model.attributes))
 	},
 	render_output : function () {
-		console.log('render output');
+		this.save_view_model(quoteModel)
 		quoteModelOutput = new B.Output.Model.Quote();
 		quoteModelOutput.set(quoteModel.toJSON());
 		quoteModelViewOutput = new B.Output.View.Quote({model:quoteModelOutput});
@@ -393,6 +412,7 @@ B.Output.Model.QuickLink				= B.Output.Model.extend({});
 			}
 		},
 		render_output : function () {
+			this.save_view_collection(quickLinkColumnsView.collection)
 			quickLinkColumnsModelOutput = new B.Output.Collection.QuickLinkColumns();
 			quickLinkColumnsModelOutput.reset(quickLinkColumnsView.collection.toJSON());
 			quickLinkColumnsViewOutput = new B.Output.View.QuickLinkColumns({collection:quickLinkColumnsModelOutput});
