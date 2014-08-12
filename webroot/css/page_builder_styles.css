@@ -1,8 +1,8 @@
-.editor_region_outer{position: static; }
-.editor_region{position: absolute; top: 0; left: 50%; margin-left:-250px;  background: #FFF; width:500px;  background: rgba(255,255,255,.9)}
+.editor_region_outer{position: static;}
+.editor_region{position: absolute; top: 0; left: 50%; margin-left:-250px;  background: #FFF; width:500px; z-index: 1000; background: rgba(255,255,255,.9)}
 .editor_region .row{margin-bottom:20px;}
 .editor_region td{padding: 10px;}
-.editor_region .block_chooser{ background: #FFF;z-index: 1200;padding: 20px;background: rgba(255,255,255,.9); margin-bottom:20px; border:solid 1px #ccc;}
+.editor_region .block_chooser{padding: 20px;background: rgba(255,255,255,.9); margin-bottom:20px; border:solid 1px #ccc;}
 .editor_region .input_wrapper{ padding: 20px; background: rgba(255,255,255,.9); border:solid 1px #ccc;}
 .editor_region .input_wrapper #dropbox{border: 2px dotted #c5c5c5;padding: 30px 20px;color: #000;border-radius: 0;position: relative;margin: 10px auto 30px;min-height: 100;overflow: hidden;width: auto;text-align: center;}
 .editor_region .input_wrapper #dropbox .message{font-size: 20px;color: #a5a5a5;}
