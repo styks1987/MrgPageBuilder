@@ -1,12 +1,12 @@
 .editor_region_outer{position: static;}
-.editor_region{position: absolute; top: 0; left: 50%; margin-left:-250px;  background: #FFF; width:500px; z-index: 1000; background: rgba(255,255,255,.9)}
+.editor_region{position: absolute; top: 0; left: 50%; margin-left:-400px; padding: 20px;  background: #FFF; width:800px; z-index: 1000; background: rgba(255,255,255,.9)}
 .editor_region .row{margin-bottom:20px;}
 .editor_region td{padding: 10px;}
 .editor_region .block_chooser{padding: 20px;background: rgba(255,255,255,.9); margin-bottom:20px; border:solid 1px #ccc;}
 .editor_region .input_wrapper{ padding: 20px; background: rgba(255,255,255,.9); border:solid 1px #ccc;}
-.editor_region .input_wrapper #dropbox{border: 2px dotted #c5c5c5;padding: 30px 20px;color: #000;border-radius: 0;position: relative;margin: 10px auto 30px;min-height: 100;overflow: hidden;width: auto;text-align: center;}
-.editor_region .input_wrapper #dropbox .message{font-size: 20px;color: #a5a5a5;}
-.editor_region .input_wrapper #dropbox .message img{width: 100px;display: block;margin: 0 auto 20px auto;}
+.editor_region .input_wrapper .dropbox{border: 2px dotted #c5c5c5;padding: 30px 20px;color: #000;border-radius: 0;position: relative;margin: 10px auto 30px;min-height: 100;overflow: hidden;width: auto;text-align: center;}
+.editor_region .input_wrapper .dropbox .message{font-size: 20px;color: #a5a5a5;}
+.editor_region .input_wrapper .dropbox .message img{width: 100px;display: block;margin: 0 auto 20px auto;}
 
 .page_builder .output_toolbar_wrapper {margin-top:20px; padding: 2px 0; border-top: solid 1px #000;}
 .page_builder .paragraph_image img{width: 100%;}

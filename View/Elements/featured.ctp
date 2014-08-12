@@ -58,8 +58,8 @@
 			<% }else{ %>
 				<div class="row">
 					<div class="col-sm-12">
-						<input type="file" id="upload_button" name="background_image" />
-						<div id="dropbox">
+						<input type="file" id="upload_button_<%= cid %>" name="background_image" />
+						<div id="dropbox_<%= cid %>" class="dropbox">
 							<div class="message"><img src="/mrg_page_builder/img/upload_files.jpg">Click here or Drop your image here.</div>
 						</div>
 					</div>

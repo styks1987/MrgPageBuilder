@@ -10,6 +10,7 @@
 
 			$this->Html->script('MrgPageBuilder.require', ['inline'=>false]);
 			$this->Html->script('MrgPageBuilder.jquery.filedrop', ['inline'=>false]);
+			$this->Html->script('MrgPageBuilder.jquery.jcarousel.min', ['inline'=>false]);
 			$this->Html->script('MrgPageBuilder.PageBuilderBackboneApp', ['inline'=>false]);
 
 

@@ -67,6 +67,18 @@ B.Editor.View = Backbone.View.extend({
 				}
 				quickLinkColumnsView.render();
 				break;
+			case 'slides':
+				if (typeof slidesView == 'undefined') {
+					slidesCollection = new B.Editor.Collection.Slides();
+					slidesView = new B.Editor.View.Slides({collection:slidesCollection, el:'#input_region'});
+				}else{
+					slidesView.setElement('#input_region');
+				}
+				if (typeof data != 'undefined') {
+					slidesCollection.reset(data);
+				}
+				slidesView.render();
+				break;
 			case 'quote':
 				if (typeof quoteView == 'undefined') {
 					quoteModel = new B.Editor.Model.Quote({quote_name:'Sam Sanderson', quote_text:'I think this is really something special.'});
@@ -180,8 +192,8 @@ B.Output.View = Backbone.View.extend({
 			this.listenToOnce(editorView, 'finished_editing', this.insert_html);
 		},
 		show_dropzones : function () {
-			console.log($('.block').is('*'));
 			if ($('.block').is('*')) {
+				this.hide_dropzones();
 				$(this.render()).insertBefore('.block');
 			}else{
 				$('#output_region').html('<div class="output_toolbar_wrapper"><a class="btn btn-primary insert_content" href="javascript:void(0)">Insert Contente</a></div>');
@@ -340,10 +352,15 @@ B.Editor.View.Featured = B.Editor.View.extend({
 		initialize : function () {
 			editorFeaturedImage = new B.Editor.View.Uploader({allowedfileextensions:['.jpg','.png'],data:{'directory':'/uploads/featured_images'}});
 			this.listenTo(editorFeaturedImage, 'finished_upload', this.finished_upload );
+			console.log(editorFeaturedImage);
 		},
 		template : _.template($('#FeaturedImage').html()),
 		render : function () {
+			this.model.attributes.cid = this.model.cid;
 			this.$el.html(this.template(this.model.attributes));
+			editorFeaturedImage.options.fallback_id = 'upload_button_'+this.model.cid;
+			editorFeaturedImage.options.upload_box = '#dropbox_'+this.model.cid;
+
 			editorFeaturedImage.render();
 		},
 		finished_upload : function (file, response) {
@@ -397,6 +414,101 @@ B.Output.View.Quote = B.Output.View.extend({
 	}
 })
 // END QUOTE
+
+// BEGIN SLIDER
+
+B.Editor.Collection.Slides 	= B.Editor.Collection.extend({});
+B.Editor.Model.SlideImage 	= B.Editor.Model.extend();
+
+B.Output.Collection.Slides 	= B.Output.Collection.extend({});
+B.Output.Model.SlideImage 	= B.Output.Model.extend({});
+
+	B.Editor.View.Slides = B.Editor.View.extend({
+		events : {
+			'click a.add_slide' : 'add_slide',
+			'click a.insert_slides' : 'render_output'
+		},
+		template : _.template($('#Slides').html()),
+		render : function () {
+			console.log('render');
+			this.$el.html(this.template());
+			this.add_all();
+			this.delegateEvents();
+		},
+		add_one : function (image) {
+			slideImageView = new B.Editor.View.SlideImage({model:image})
+			this.$el.find('#slide_image_region').append(slideImageView.render());
+			featuredImageView = new B.Editor.View.FeaturedImageView({model:slideImageView.model, el:slideImageView.$el.find('.image_region')});
+			featuredImageView.render();
+		},
+		add_all : function () {
+			this.collection.forEach(this.add_one, this);
+		},
+		add_slide : function () {
+			console.log('add slide');
+			defaults = {background_image:'', img_alt:'', img:'', caption:'', overlay_title:'', overlay_text:'',cta_link:'',cta_text:''};
+			slideImageModel = new B.Editor.Model.SlideImage(defaults);
+			this.collection.add(slideImageModel);
+			this.add_one(slideImageModel);
+		},
+		render_output : function () {
+			slidesCollectionOutput = new B.Output.Collection.Slides();
+			slidesCollectionOutput.reset(slidesView.collection.toJSON());
+			slidesViewOutput = new B.Output.View.Slides({collection:slidesCollectionOutput});
+			console.log(slidesViewOutput.render().html());
+			this.render_to_preview(slidesViewOutput.render().html());
+		}
+
+	});
+
+		B.Editor.View.SlideImage = B.Editor.View.Slides.extend({
+
+			events:{
+				'keyup .slide_form input.editable' : 'update_model',
+				'keyup .slide_form textarea.editable' : 'update_model',
+				'change .slide_form select.editable' : 'update_model',
+				'click a.delete_slide' : 'delete_slide'
+			},
+			template : _.template($('#SlideImage').html()),
+			render : function () {
+				this.$el.html(this.template(this.model.attributes));
+
+				return this.$el
+			},
+			delete_slide : function () {
+				this.model.destroy();
+				this.remove();
+			}
+		})
+
+	B.Output.View.Slides = B.Output.View.extend({
+		initialize:function(){},
+		template : _.template($('#OutputSlides').html()),
+		render : function () {
+			this.$el.html(this.template({image_count:this.collection.length, model_json:JSON.stringify(this.collection.toJSON())}));
+			this.add_all();
+			return this.$el;
+		},
+		add_one : function (column, index) {
+			console.log('add_one', column);
+			slideImageViewOutput = new B.Output.View.SlideImage({model:column, tagName:'li'});
+			console.log(slideImageViewOutput.render());
+			this.$el.find('.slider_images_region').append(slideImageViewOutput.render());
+		},
+		add_all : function () {
+			this.collection.forEach(this.add_one, this);
+		}
+	});
+
+		B.Output.View.SlideImage = B.Output.View.Slides.extend({
+			template : _.template($('#OutputSlideImage').html()),
+			render : function () {
+				return this.$el.html(this.template(this.model.attributes))
+			}
+		})
+
+
+// END SLIDER
 
 
 
@@ -620,11 +732,13 @@ B.Editor.View.Uploader = B.Editor.View.extend({
 				}
 			},
 			initialize : function (options) {
+				console.log(options);
 				if (typeof options != 'undefined') {
 					_.extend(this.options, options);
 				}
 			},
 			render : function () {
+				console.log(this.options);
 				var dropbox = $(this.options.upload_box);
 				var message = $('.message', dropbox);
 				var self = this;
@@ -683,7 +797,7 @@ B.Editor.View.Uploader = B.Editor.View.extend({
 				return true;
 			},
 			progress_updated : function (i, file, progress) {
-				$.data(file).find('.progress').width(progress);
+				//$.data(file).find('.progress').width(progress);
 			},
 			upload_started : function (i, file, len) {
 				this.create_image(file);
@@ -726,7 +840,7 @@ B.Editor.View.Uploader = B.Editor.View.extend({
 				// this will trigger the onload function above:
 				reader.readAsDataURL(file);
 
-				preview.appendTo(dropbox);
+				//preview.appendTo(dropbox);s
 
 				// Associating a preview container
 				// with the file, using jQuery's $.data():
