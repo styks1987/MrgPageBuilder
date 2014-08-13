@@ -1,6 +1,3 @@
-
-
-
 $(document).ready(function(){
 
 
@@ -41,14 +38,11 @@ B.Editor.View = Backbone.View.extend({
 		this.model.set(column, value);
 	},
 	choose_module : function (e) {
-		console.log('choose module');
 		value = $(e.currentTarget).val();
-		console.log(value);
 		this.show_module(value);
 	},
 	set_module : function (value, data) {
 		this.undelegateEvents();
-		console.log(this.$el.find('.module'));
 		this.$el.find('.module option[value="'+value+'"]').prop('selected', true);
 		this.delegateEvents();
 		this.show_module(value,data);
@@ -127,6 +121,18 @@ B.Editor.View = Backbone.View.extend({
 				}
 				paragraphImageView.render();
 				break;
+			case 'grid_images':
+				if (typeof gridImagesView == 'undefined') {
+					gridImagesCollection = new B.Editor.Collection.GridImages();
+					gridImagesView = new B.Editor.View.GridImages({collection:gridImagesCollection, el:'#input_region'});
+				}else{
+					gridImagesView.setElement('#input_region');
+				}
+				if (typeof data != 'undefined') {
+					gridImagesCollection.reset(data);
+				}
+				gridImagesView.render();
+				break;
 		}
 	},
 
@@ -138,7 +144,6 @@ B.Editor.View = Backbone.View.extend({
 	},
 	// When the user finishes and wants to insert it into the page
 	render_to_preview: function (html) {
-		//console.log(output);
 		editorView.trigger('finished_editing', html);
 		editorView.$el.empty();
 		// Empties the view that called it
@@ -172,7 +177,9 @@ B.Output.View = Backbone.View.extend({
 		events : {
 			'click a.insert_content' : 'show_editor',
 			'click a.edit_content' : 'edit_content',
-			'click a.delete_content' : 'delete_content'
+			'click a.delete_content' : 'delete_content',
+			'click a.move_up' : 'move_up',
+			'click a.move_down' : 'move_down',
 		},
 		template : _.template($('#OutputToolbar').html()),
 		render : function () {
@@ -182,10 +189,11 @@ B.Output.View = Backbone.View.extend({
 		},
 		save : function () {
 			model = new B.Save.Model()
+			this.hide_dropzones();
 			model.save();
+			this.show_dropzones();
 		},
 		show_editor : function(e){
-			console.log('show editor');
 			editorView.render();
 			this.scroll_to(editorView.$el);
 			this.insert_location = $(e.currentTarget).closest('.output_toolbar_wrapper');
@@ -210,19 +218,15 @@ B.Output.View = Backbone.View.extend({
 		insert_html : function (preview_html){
 			this.$el.empty();
 			if (this.is_edit) {
-				console.log('editing');
 				// if we are editing we want to
 				// replace instead of append
 				$(this.current_block).remove();
 				$(this.insert_location).after(preview_html);
 			}else{
-				console.log('not edit');
 				$(this.insert_location).before(preview_html);
 			}
 
-			this.hide_dropzones();
 			this.save();
-			this.show_dropzones();
 		},
 		edit_content : function (e){
 			this.is_edit = true;
@@ -235,12 +239,37 @@ B.Output.View = Backbone.View.extend({
 			editorView.set_module(block_type, data);
 		},
 		delete_content : function (e) {
-			console.log($(e.currentTarget).closest('.output_toolbar_wrapper'));
-			console.log($(e.currentTarget).closest('.output_toolbar_wrapper').next('.block'));
 			$(e.currentTarget).closest('.output_toolbar_wrapper').next('.block').remove();
 			$(e.currentTarget).closest('.output_toolbar_wrapper').remove();
 			this.save();
+		},
+		move_up : function (e) {
+			toolbar = $(e.currentTarget).closest('.output_toolbar_wrapper');
+			block = toolbar.next();
+			new_position = toolbar.prev().prev();
+			if ($(new_position).is('*')) {
+				block.insertBefore(new_position);
+				toolbar.insertBefore(block);
+				this.scroll_to(toolbar);
+				this.save();
+			}else{
+				alert('This block cannot move any higher');
+			}
+		},
+		move_down : function (e) {
+			toolbar = $(e.currentTarget).closest('.output_toolbar_wrapper');
+			block = toolbar.next();
+			new_position = toolbar.next().next().next();
+			if ($(new_position).is('*')) {
+				block.insertAfter(new_position);
+				toolbar.insertBefore(block);
+				this.save();
+			}else{
+				alert('This block cannot move any lower');
+			}
+
 		}
+
 	})
 
 // BEGIN Image and PARAGRAPH
@@ -352,7 +381,6 @@ B.Editor.View.Featured = B.Editor.View.extend({
 		initialize : function () {
 			editorFeaturedImage = new B.Editor.View.Uploader({allowedfileextensions:['.jpg','.png'],data:{'directory':'/uploads/featured_images'}});
 			this.listenTo(editorFeaturedImage, 'finished_upload', this.finished_upload );
-			console.log(editorFeaturedImage);
 		},
 		template : _.template($('#FeaturedImage').html()),
 		render : function () {
@@ -430,7 +458,6 @@ B.Output.Model.SlideImage 	= B.Output.Model.extend({});
 		},
 		template : _.template($('#Slides').html()),
 		render : function () {
-			console.log('render');
 			this.$el.html(this.template());
 			this.add_all();
 			this.delegateEvents();
@@ -445,7 +472,6 @@ B.Output.Model.SlideImage 	= B.Output.Model.extend({});
 			this.collection.forEach(this.add_one, this);
 		},
 		add_slide : function () {
-			console.log('add slide');
 			defaults = {background_image:'', img_alt:'', img:'', caption:'', overlay_title:'', overlay_text:'',cta_link:'',cta_text:''};
 			slideImageModel = new B.Editor.Model.SlideImage(defaults);
 			this.collection.add(slideImageModel);
@@ -455,7 +481,6 @@ B.Output.Model.SlideImage 	= B.Output.Model.extend({});
 			slidesCollectionOutput = new B.Output.Collection.Slides();
 			slidesCollectionOutput.reset(slidesView.collection.toJSON());
 			slidesViewOutput = new B.Output.View.Slides({collection:slidesCollectionOutput});
-			console.log(slidesViewOutput.render().html());
 			this.render_to_preview(slidesViewOutput.render().html());
 		}
 
@@ -490,9 +515,7 @@ B.Output.Model.SlideImage 	= B.Output.Model.extend({});
 			return this.$el;
 		},
 		add_one : function (column, index) {
-			console.log('add_one', column);
 			slideImageViewOutput = new B.Output.View.SlideImage({model:column, tagName:'li'});
-			console.log(slideImageViewOutput.render());
 			this.$el.find('.slider_images_region').append(slideImageViewOutput.render());
 		},
 		add_all : function () {
@@ -502,6 +525,113 @@ B.Output.Model.SlideImage 	= B.Output.Model.extend({});
 
 		B.Output.View.SlideImage = B.Output.View.Slides.extend({
 			template : _.template($('#OutputSlideImage').html()),
+			render : function () {
+				return this.$el.html(this.template(this.model.attributes))
+			}
+		})
+
+
+// END SLIDER
+
+
+// BEGIN Paragraph Image Above
+
+B.Editor.Collection.GridImages 	= B.Editor.Collection.extend({});
+B.Editor.Model.GridImage 	= B.Editor.Model.extend();
+
+B.Output.Collection.GridImages 	= B.Output.Collection.extend({});
+B.Output.Model.GridImage 	= B.Output.Model.extend({});
+
+	B.Editor.View.GridImages = B.Editor.View.extend({
+		events : {
+			'click a.add_image' : 'add_image',
+			'click a.insert_grid' : 'render_output',
+			'keyup input.section_heading' : 'save_section_heading'
+		},
+		template : _.template($('#GridImages').html()),
+		render : function () {
+			this.$el.html(this.template({section_heading:''}));
+			this.add_all();
+			this.delegateEvents();
+		},
+		add_one : function (image) {
+			gridImageView = new B.Editor.View.GridImage({model:image})
+			this.$el.find('#grid_image_region').append(gridImageView.render());
+			featuredImageView = new B.Editor.View.FeaturedImageView({model:gridImageView.model, el:gridImageView.$el.find('.grid_image_region')});
+			featuredImageView.render();
+		},
+		add_all : function () {
+			this.collection.forEach(this.add_one, this);
+		},
+		add_image : function () {
+			if (this.collection.length < 2) {
+				defaults = {background_image:'', img_alt:'', header:'', paragraph:'',section_heading:''};
+				gridImageModel = new B.Editor.Model.GridImage(defaults);
+				this.collection.add(gridImageModel);
+				this.add_one(gridImageModel);
+			}else{
+				alert('You can add up to 2 images. If you want more, just create another grid section.');
+			}
+		},
+		// to keep from having to make 2 more views
+		// Just save this to every model
+		save_section_heading : function (e) {
+			this.section_heading = $(e.currentTarget).val();
+			this.collection.forEach(this.set_model_section_heading, this);
+		},
+		set_model_section_heading : function (model) {
+			model.set('section_heading', this.section_heading);
+		},
+		render_output : function () {
+			gridImagesCollectionOutput = new B.Output.Collection.GridImages();
+			gridImagesCollectionOutput.reset(gridImagesView.collection.toJSON());
+			gridImagesViewOutput = new B.Output.View.GridImages({collection:gridImagesCollectionOutput});
+			this.render_to_preview(gridImagesViewOutput.render().html());
+		}
+
+	});
+		B.Editor.View.GridImage = B.Editor.View.GridImages.extend({
+			events:{
+				'keyup .grid_form input.editable' : 'update_model',
+				'keyup .grid_form textarea.editable' : 'update_model',
+				'change .grid_form select.editable' : 'update_model',
+				'click a.delete_grid' : 'delete_grid'
+			},
+			template : _.template($('#GridImage').html()),
+			render : function () {
+				this.$el.html(this.template(this.model.attributes));
+
+				return this.$el
+			},
+			delete_grid : function () {
+				this.model.destroy();
+				this.remove();
+			}
+		})
+
+	B.Output.View.GridImages = B.Output.View.extend({
+		initialize:function(){},
+		template : _.template($('#OutputGridImages').html()),
+		render : function () {
+			this.section_heading = this.collection.at(0).get('section_heading');
+			this.$el.html(this.template({section_heading : this.section_heading, model_json:JSON.stringify(this.collection.toJSON())}));
+			this.add_all();
+			return this.$el;
+		},
+		add_one : function (column, index) {
+			column_widths = 12 / this.collection.length;
+
+
+			gridImageViewOutput = new B.Output.View.GridImage({model:column, className:'col-sm-'+column_widths});
+			this.$el.find('.grid_images_region').append(gridImageViewOutput.render());
+		},
+		add_all : function () {
+			this.collection.forEach(this.add_one, this);
+		}
+	});
+
+		B.Output.View.GridImage = B.Output.View.GridImages.extend({
+			template : _.template($('#OutputGridImage').html()),
 			render : function () {
 				return this.$el.html(this.template(this.model.attributes))
 			}
@@ -732,13 +862,11 @@ B.Editor.View.Uploader = B.Editor.View.extend({
 				}
 			},
 			initialize : function (options) {
-				console.log(options);
 				if (typeof options != 'undefined') {
 					_.extend(this.options, options);
 				}
 			},
 			render : function () {
-				console.log(this.options);
 				var dropbox = $(this.options.upload_box);
 				var message = $('.message', dropbox);
 				var self = this;

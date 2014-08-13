@@ -11,6 +11,7 @@
 			<option value="paragraph">Paragraph</option>
 			<option value="paragraph_image">Paragraph w/ Image</option>
 			<option value="slides">Slider</option>
+			<option value="grid_images">Image Grid</option>
 		</select>
 	</div>
 	<div id="background_overlay"></div>
@@ -19,6 +20,7 @@
 
 <?php echo $this->element('MrgPageBuilder.output_region', ['data'=>$data, 'model'=>$model, 'fieldName'=>$fieldName]); ?>
 
+<?php echo $this->element('MrgPageBuilder.grid_images'); ?>
 <?php echo $this->element('MrgPageBuilder.slider'); ?>
 <?php echo $this->element('MrgPageBuilder.paragraph_image'); ?>
 <?php echo $this->element('MrgPageBuilder.paragraph'); ?>
