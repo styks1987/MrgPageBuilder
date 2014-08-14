@@ -225,7 +225,6 @@ B.Output.View = Backbone.View.extend({
 			}else{
 				$(this.insert_location).before(preview_html);
 			}
-
 			this.save();
 		},
 		edit_content : function (e){
