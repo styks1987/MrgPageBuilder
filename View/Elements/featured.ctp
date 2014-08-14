@@ -14,7 +14,7 @@
 		<div class="row">
 			<div class="col-sm-12">
 				<label>Subheading</label>
-				<textarea class="form-control editable" name="subheading"><%= subheader %></textarea>
+				<textarea class="form-control editable" name="subheader"><%= subheader %></textarea>
 			</div>
 		</div>
 		<div class="row">
