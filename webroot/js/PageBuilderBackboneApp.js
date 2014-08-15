@@ -51,7 +51,8 @@ B.Editor.View = Backbone.View.extend({
 		switch(value){
 			case 'quick_links':
 				if (typeof quickLinkColumnsView == 'undefined') {
-					quickLinkColumnList = new B.Editor.Collection.QuickLinkColumns();
+					quickLinkColumn = new B.Editor.Model.QuickLinkColumn();
+					quickLinkColumnList = new B.Editor.Collection.QuickLinkColumns({model:quickLinkColumn});
 					quickLinkColumnsView = new B.Editor.View.QuickLinkColumns({collection:quickLinkColumnList, el:'#input_region'});
 				}else{
 					quickLinkColumnsView.setElement('#input_region');
@@ -74,23 +75,20 @@ B.Editor.View = Backbone.View.extend({
 				slidesView.render();
 				break;
 			case 'quote':
-				var defaults = {quote_name:'', quote_text:''};
 				if (typeof quoteView == 'undefined') {
-					quoteModel = new B.Editor.Model.Quote(defaults);
+					quoteModel = new B.Editor.Model.Quote();
 					quoteView = new B.Editor.View.Quote({model:quoteModel, el:'#input_region'});
 				}else{
 					quoteView.setElement('#input_region');
 				}
 				if (typeof data != 'undefined') {
 					quoteModel.set(data);
-				}else{
-					quoteModel.set(defaults);
 				}
 				quoteView.render();
 				break;
 			case 'featured':
 				if (typeof featuredView == 'undefined') {
-					featuredModel = new B.Editor.Model.Featured({header:'Headline', subheader:'A specific headline', cta_text:'CTA Text', cta_link:'CTA link', background_image:''});
+					featuredModel = new B.Editor.Model.Featured();
 					featuredView = new B.Editor.View.Featured({model:featuredModel, el:'#input_region'});
 				}else{
 					featuredView.setElement('#input_region');
@@ -102,7 +100,7 @@ B.Editor.View = Backbone.View.extend({
 				break;
 			case 'paragraph':
 				if (typeof paragraphView == 'undefined') {
-					paragraphModel = new B.Editor.Model.Paragraph({header:'Headline', paragraph:'An example paragraph'});
+					paragraphModel = new B.Editor.Model.Paragraph();
 					paragraphView = new B.Editor.View.Paragraph({model:paragraphModel, el:'#input_region'});
 				}else{
 					paragraphView.setElement('#input_region');
@@ -114,7 +112,7 @@ B.Editor.View = Backbone.View.extend({
 				break;
 			case 'paragraph_image':
 				if (typeof paragraphImageView == 'undefined') {
-					paragraphImageModel = new B.Editor.Model.ParagraphImage({header:'Headline', paragraph:'An example paragraph', image_link:'', image_alt_text:'', cta_text:'CTA Text', cta_link:'CTA link', background_image:''});
+					paragraphImageModel = new B.Editor.Model.ParagraphImage();
 					paragraphImageView = new B.Editor.View.ParagraphImage({model:paragraphImageModel, el:'#input_region'});
 				}else{
 					paragraphImageView.setElement('#input_region');
@@ -176,6 +174,9 @@ B.Editor.View = Backbone.View.extend({
 		e.preventDefault();
 		var text = e.originalEvent.clipboardData.getData("text/plain");
 		document.execCommand("insertHTML", false, text);
+	},
+	print_stack_trace : function (e) {
+		return printStackTrace({e:e});
 	}
 });
 
@@ -197,6 +198,9 @@ B.Output.View = Backbone.View.extend({
 	},
 	scroll_to : function(el, offset){
 		$('html,body').animate({ scrollTop: el.offset().top - offset});
+	},
+	print_stack_trace : function (e) {
+		return printStackTrace({e:e});
 	}
 });
 
@@ -268,7 +272,8 @@ B.Output.View = Backbone.View.extend({
 				this.show_editor(e);
 				editorView.set_module(block_type, data);
 			} catch(e) {
-				alert('It seems the data has become corrupted. It usually can be recovered. You can recreate this view and then delete it or send us this string and the page you were editing. '+"\n\n"+json_string+"\n\n"+e);
+				stack = this.print_stack_trace(e);
+				alert('It seems the data has become corrupted. It usually can be recovered. You can recreate this view and then delete it or send us this string and the page you were editing. '+"\n\n"+json_string+"\n\n"+stack);
 			}
 
 
@@ -310,7 +315,7 @@ B.Output.View = Backbone.View.extend({
 	})
 
 // BEGIN Image and PARAGRAPH
-B.Editor.Model.ParagraphImage = B.Editor.Model.extend();
+B.Editor.Model.ParagraphImage = B.Editor.Model.extend({defaults: {header:'Headline', paragraph:'An example paragraph', image_link:'', image_alt_text:'', cta_text:'CTA Text', cta_link:'CTA link', background_image:''}});
 B.Output.Model.ParagraphImage = B.Output.Model.extend();
 
 B.Editor.View.ParagraphImage = B.Editor.View.extend({
@@ -350,7 +355,7 @@ B.Output.View.ParagraphImage = B.Output.View.extend({
 
 
 // BEGIN TEXT and PARAGRAPH
-B.Editor.Model.Paragraph = B.Editor.Model.extend();
+B.Editor.Model.Paragraph = B.Editor.Model.extend({defaults:{header:'Headline', paragraph:'An example paragraph'}});
 B.Output.Model.Paragraph = B.Output.Model.extend();
 
 B.Editor.View.Paragraph = B.Editor.View.extend({
@@ -388,7 +393,7 @@ B.Output.View.Paragraph = B.Output.View.extend({
 
 
 // BEGIN FEATURED
-B.Editor.Model.Featured = B.Editor.Model.extend();
+B.Editor.Model.Featured = B.Editor.Model.extend({defaults:{header:'Headline', subheader:'A specific headline', cta_text:'CTA Text', cta_link:'CTA link', background_image:''}});
 B.Output.Model.Featured = B.Output.Model.extend();
 
 B.Editor.View.Featured = B.Editor.View.extend({
@@ -452,7 +457,7 @@ B.Output.View.Featured = B.Output.View.extend({
 // END FEATURED
 
 // BEGIN QUOTE
-B.Editor.Model.Quote = B.Editor.Model.extend();
+B.Editor.Model.Quote = B.Editor.Model.extend({defaults : {quote_name:'', quote_text:''}});
 B.Output.Model.Quote = B.Output.Model.extend();
 
 B.Editor.View.Quote = B.Editor.View.extend({
@@ -584,7 +589,7 @@ B.Output.Model.SlideImage 	= B.Output.Model.extend({});
 // BEGIN Paragraph Image Above
 
 B.Editor.Collection.GridImages 	= B.Editor.Collection.extend({});
-B.Editor.Model.GridImage 	= B.Editor.Model.extend();
+B.Editor.Model.GridImage 	= B.Editor.Model.extend({defaults:function () {return {background_image:"",section_link:"",img_alt:"",header:"",paragraph:"",section_heading:""}}});
 
 B.Output.Collection.GridImages 	= B.Output.Collection.extend({});
 B.Output.Model.GridImage 	= B.Output.Model.extend({});
@@ -603,6 +608,10 @@ B.Output.Model.GridImage 	= B.Output.Model.extend({});
 			this.delegateEvents();
 		},
 		add_one : function (image) {
+			var quickGridImageModel = new B.Editor.Model.GridImage();
+			image.set(_.extend(quickGridImageModel.defaults(), image.attributes));
+			quickGridImageModel.destroy();
+
 			gridImageView = new B.Editor.View.GridImage({model:image})
 			this.$el.find('#grid_image_region').append(gridImageView.render());
 			featuredImageView = new B.Editor.View.FeaturedImageView({model:gridImageView.model, el:gridImageView.$el.find('.grid_image_region')});
@@ -696,9 +705,9 @@ B.Output.Model.GridImage 	= B.Output.Model.extend({});
 
 // BEGIN QUICK LINKS
 B.Editor.Collection.QuickLinkColumns 	= B.Editor.Collection.extend({});
-B.Editor.Model.QuickLinkColumn 			= B.Editor.Model.extend();
+B.Editor.Model.QuickLinkColumn 			= B.Editor.Model.extend({defaults : function () { return {name:'New Column', column_name_link:'', links:{}}}});
 B.Editor.Collection.QuickLinks 			= B.Editor.Collection.extend({});
-B.Editor.Model.QuickLink				= B.Editor.Model.extend({});
+B.Editor.Model.QuickLink				= B.Editor.Model.extend({defaults : function () { return {url:'example.com', text:'Example Text'}}});
 
 B.Output.Collection.QuickLinkColumns 	= B.Output.Collection.extend({});
 B.Output.Model.QuickLinkColumn 			= B.Output.Model.extend({});
@@ -718,7 +727,10 @@ B.Output.Model.QuickLink				= B.Output.Model.extend({});
 			this.add_all();
 		},
 		add_one : function (column) {
-			quickLinkColumn = new B.Editor.View.QuickLinkColumn({model:column})
+			var quickLinkColumnModel = new B.Editor.Model.QuickLinkColumn();
+			column.set(_.extend(quickLinkColumnModel.defaults(), column.attributes));
+			quickLinkColumnModel.destroy();
+			quickLinkColumn = new B.Editor.View.QuickLinkColumn({model:column});
 			this.$el.find('#column_region').append(quickLinkColumn.render());
 		},
 		add_all : function () {
@@ -726,8 +738,8 @@ B.Output.Model.QuickLink				= B.Output.Model.extend({});
 		},
 		add_column : function () {
 			if (this.collection.length < 4) {
-				defaults = {name:'New Column', column_name_link:'', links:[{url:'', text:''}]};
-				quickLinkColumnModel = new B.Editor.Model.QuickLinkColumn(defaults);
+				quickLinkColumnModel = new B.Editor.Model.QuickLinkColumn();
+				quickLinkColumnModel.set(quickLinkColumnModel.defaults());
 				this.collection.add(quickLinkColumnModel);
 				this.render();
 			}else{
@@ -754,8 +766,8 @@ B.Output.Model.QuickLink				= B.Output.Model.extend({});
 			},
 			template : _.template($('#QuickLinkColumn').html()),
 			render : function () {
-				this.$el.html(this.template(this.model.attributes))
 
+				this.$el.html(this.template(this.model.attributes))
 				links = this.model.get('links');
 				quickLinkList = new B.Editor.Collection.QuickLinks();
 				quickLinkList.reset(links);
@@ -776,8 +788,6 @@ B.Output.Model.QuickLink				= B.Output.Model.extend({});
 				this.$el.find('.links_region').append(quickLinksView.render());
 
 				return this.$el;
-
-
 			},
 
 			update_parent_collection : function (c) {
@@ -799,6 +809,10 @@ B.Output.Model.QuickLink				= B.Output.Model.extend({});
 					return this.$el;
 				},
 				add_one : function (link) {
+					var quickLinkModel = new B.Editor.Model.QuickLink();
+					link.set(_.extend(quickLinkModel.defaults(), link.attributes));
+					quickLinkModel.destroy();
+
 					quickLink = new B.Editor.View.QuickLink({model:link});
 					this.$el.find('tr:first-of-type').after(quickLink.render());
 				},
@@ -806,8 +820,7 @@ B.Output.Model.QuickLink				= B.Output.Model.extend({});
 					this.collection.forEach(this.add_one, this);
 				},
 				add_link : function () {
-					defaults = {url:'example.com', text:'Example Text'};
-					quickLinkModel = new B.Editor.Model.QuickLink(defaults);
+					quickLinkModel = new B.Editor.Model.QuickLink();
 					this.collection.add(quickLinkModel);
 					this.render();
 				}

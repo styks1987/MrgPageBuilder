@@ -8,9 +8,10 @@
 
 			echo $this->Html->css('MrgPageBuilder.page_builder_styles');
 
-			$this->Html->script('MrgPageBuilder.require', ['inline'=>false]);
+			//$this->Html->script('MrgPageBuilder.require', ['inline'=>false]);
 			$this->Html->script('MrgPageBuilder.jquery.filedrop', ['inline'=>false]);
 			$this->Html->script('MrgPageBuilder.jquery.jcarousel.min', ['inline'=>false]);
+			$this->Html->script('vendor/stacktrace', ['inline'=>false]);
 			$this->Html->script('MrgPageBuilder.PageBuilderBackboneApp', ['inline'=>false]);
 
 
