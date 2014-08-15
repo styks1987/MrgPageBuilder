@@ -13,6 +13,7 @@
 			<option value="slides">Slider</option>
 			<option value="grid_images">Image Grid</option>
 		</select>
+		<a href="javascript:void(0)" class="glyphicon glyphicon-remove close"></a>
 	</div>
 	<div id="background_overlay"></div>
 

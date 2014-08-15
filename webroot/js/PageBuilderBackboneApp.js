@@ -25,7 +25,8 @@ B.Save.Model = Backbone.Model.extend({
 
 B.Editor.View = Backbone.View.extend({
 	events : {
-		'change .module' : 'choose_module'
+		'change .module' : 'choose_module',
+		'click .close' : 'close_view',
 	},
 	template : _.template($('#Editor').html()),
 	render : function () {
@@ -42,7 +43,6 @@ B.Editor.View = Backbone.View.extend({
 		this.show_module(value);
 	},
 	set_module : function (value, data) {
-		this.undelegateEvents();
 		this.$el.find('.module option[value="'+value+'"]').prop('selected', true);
 		this.delegateEvents();
 		this.show_module(value,data);
@@ -74,14 +74,17 @@ B.Editor.View = Backbone.View.extend({
 				slidesView.render();
 				break;
 			case 'quote':
+				var defaults = {quote_name:'', quote_text:''};
 				if (typeof quoteView == 'undefined') {
-					quoteModel = new B.Editor.Model.Quote({quote_name:'Sam Sanderson', quote_text:'I think this is really something special.'});
+					quoteModel = new B.Editor.Model.Quote(defaults);
 					quoteView = new B.Editor.View.Quote({model:quoteModel, el:'#input_region'});
 				}else{
 					quoteView.setElement('#input_region');
 				}
 				if (typeof data != 'undefined') {
 					quoteModel.set(data);
+				}else{
+					quoteModel.set(defaults);
 				}
 				quoteView.render();
 				break;
@@ -135,12 +138,28 @@ B.Editor.View = Backbone.View.extend({
 				break;
 		}
 	},
+	close_view : function (){
+		if (confirm('Are you sure you want to close this view without saving it?')) {
+			this.$el.empty();
+			$('#input_region').empty();
+		}
+	},
 
 
 	// Save the data for later if the file ever needs to be edited
 	save_view_model : function (model) {
 		delete model.attributes.model_json;
-		model.set('model_json', JSON.stringify(model.attributes));
+		try {
+			this.test_json_encode_decode(model.attributes);
+			json_string = JSON.stringify(model.attributes);
+			JSON.parse(json_string);
+			model.set('model_json', json_string);
+			error = 0;
+		} catch(e) {
+			error = 1;
+			alert('There was an error while saving your data. Please check that you have not copied and pasted illegal characters into the text box. If this persists, do not close this page and contact us. Please send us the following output. '+json_string);
+		}
+		return (error)?false:true;
 	},
 	// When the user finishes and wants to insert it into the page
 	render_to_preview: function (html) {
@@ -148,6 +167,15 @@ B.Editor.View = Backbone.View.extend({
 		editorView.$el.empty();
 		// Empties the view that called it
 		this.$el.empty();
+	},
+	test_json_encode_decode : function (json){
+		json_string = JSON.stringify(json);
+		return JSON.parse(json_string);
+	},
+	handle_paste : function (e) {
+		e.preventDefault();
+		var text = e.originalEvent.clipboardData.getData("text/plain");
+		document.execCommand("insertHTML", false, text);
 	}
 });
 
@@ -232,15 +260,25 @@ B.Output.View = Backbone.View.extend({
 			// Needs to replace existing content
 			this.current_block = $(e.currentTarget).closest('.output_toolbar_wrapper').next('.block');
 			block_type = $(this.current_block).data('block_type');
-			data = JSON.parse($(this.current_block).find('[name="model"]').val());
-			delete data.model_json;
-			this.show_editor(e);
-			editorView.set_module(block_type, data);
+			try {
+				json_string = $(this.current_block).find('[name="model"]').val();
+				data = JSON.parse(json_string);
+
+				delete data.model_json;
+				this.show_editor(e);
+				editorView.set_module(block_type, data);
+			} catch(e) {
+				alert('It seems the data has become corrupted. It usually can be recovered. You can recreate this view and then delete it or send us this string and the page you were editing. '+"\n\n"+json_string+"\n\n"+e);
+			}
+
+
 		},
 		delete_content : function (e) {
-			$(e.currentTarget).closest('.output_toolbar_wrapper').next('.block').remove();
-			$(e.currentTarget).closest('.output_toolbar_wrapper').remove();
-			this.save();
+			if (confirm('Are you sure you want to delete this section? This cannot be undone.')) {
+				$(e.currentTarget).closest('.output_toolbar_wrapper').next('.block').remove();
+				$(e.currentTarget).closest('.output_toolbar_wrapper').remove();
+				this.save();
+			}
 		},
 		move_up : function (e) {
 			toolbar = $(e.currentTarget).closest('.output_toolbar_wrapper');
@@ -280,7 +318,8 @@ B.Editor.View.ParagraphImage = B.Editor.View.extend({
 		'click a.insert_paragraph_image' : 'render_paragraph_image_output',
 		'keyup .paragraph_image input.editable' : 'update_model',
 		'keyup .paragraph_image textarea.editable' : 'update_model',
-		'change .paragraph_image select.editable' : 'update_model'
+		'change .paragraph_image select.editable' : 'update_model',
+		'paste .paragraph_image .editable' : 'handle_paste',
 	},
 	template : _.template($('#ParagraphImage').html()),
 	render:function () {
@@ -289,13 +328,12 @@ B.Editor.View.ParagraphImage = B.Editor.View.extend({
 		featuredImageView.render();
 	},
 	render_paragraph_image_output : function () {
-
-		this.save_view_model(paragraphImageModel);
-
-		paragraphImageModelOutput = new B.Output.Model.ParagraphImage();
-		paragraphImageModelOutput.set(paragraphImageModel.toJSON());
-		paragraphImageModelViewOutput = new B.Output.View.ParagraphImage({model:paragraphImageModelOutput});
-		this.render_to_preview(paragraphImageModelViewOutput.render().html());
+		if(this.save_view_model(paragraphImageModel)){
+			paragraphImageModelOutput = new B.Output.Model.ParagraphImage();
+			paragraphImageModelOutput.set(paragraphImageModel.toJSON());
+			paragraphImageModelViewOutput = new B.Output.View.ParagraphImage({model:paragraphImageModelOutput});
+			this.render_to_preview(paragraphImageModelViewOutput.render().html());
+		}
 	}
 });
 
@@ -320,7 +358,8 @@ B.Editor.View.Paragraph = B.Editor.View.extend({
 		'click a.insert_paragraph' : 'render_paragraph_output',
 		'keyup .paragraph input.editable' : 'update_model',
 		'keyup .paragraph textarea.editable' : 'update_model',
-		'change .paragraph select.editable' : 'update_model'
+		'change .paragraph select.editable' : 'update_model',
+		'paste .paragraph .editable' : 'handle_paste',
 	},
 	template : _.template($('#Paragraph').html()),
 	render:function () {
@@ -328,11 +367,12 @@ B.Editor.View.Paragraph = B.Editor.View.extend({
 		this.$el.html(this.template(this.model.attributes))
 	},
 	render_paragraph_output : function () {
-		this.save_view_model(paragraphModel);
-		paragraphModelOutput = new B.Output.Model.Paragraph();
-		paragraphModelOutput.set(paragraphModel.toJSON());
-		paragraphModelViewOutput = new B.Output.View.Paragraph({model:paragraphModelOutput});
-		this.render_to_preview(paragraphModelViewOutput.render().html());
+		if(this.save_view_model(paragraphModel)){
+			paragraphModelOutput = new B.Output.Model.Paragraph();
+			paragraphModelOutput.set(paragraphModel.toJSON());
+			paragraphModelViewOutput = new B.Output.View.Paragraph({model:paragraphModelOutput});
+			this.render_to_preview(paragraphModelViewOutput.render().html());
+		}
 	}
 });
 
@@ -353,10 +393,11 @@ B.Output.Model.Featured = B.Output.Model.extend();
 
 B.Editor.View.Featured = B.Editor.View.extend({
 	events : {
-		'click a.insert_featured' : 'render_output',
+		'click a.insert_featured' : 'render_featured_output',
 		'keyup .featured input.editable' : 'update_model',
 		'keyup .featured textarea.editable' : 'update_model',
 		'change .featured select.editable' : 'update_model',
+		'paste .featured .editable' : 'handle_paste',
 	},
 	template : _.template($('#Featured').html()),
 	render:function () {
@@ -364,12 +405,13 @@ B.Editor.View.Featured = B.Editor.View.extend({
 		featuredImageView = new B.Editor.View.FeaturedImageView({model:this.model, el:'.image_region'});
 		featuredImageView.render();
 	},
-	render_output : function () {
-		this.save_view_model(featuredModel);
-		featuredModelOutput = new B.Output.Model.Featured();
-		featuredModelOutput.set(featuredModel.toJSON());
-		featuredModelViewOutput = new B.Output.View.Featured({model:featuredModelOutput});
-		this.render_to_preview(featuredModelViewOutput.render().html());
+	render_featured_output : function () {
+		if(this.save_view_model(featuredModel)){
+			featuredModelOutput = new B.Output.Model.Featured();
+			featuredModelOutput.set(featuredModel.toJSON());
+			featuredModelViewOutput = new B.Output.View.Featured({model:featuredModelOutput});
+			this.render_to_preview(featuredModelViewOutput.render().html());
+		}
 	}
 });
 
@@ -415,21 +457,23 @@ B.Output.Model.Quote = B.Output.Model.extend();
 
 B.Editor.View.Quote = B.Editor.View.extend({
 	events : {
-		'click a.insert_quote' : 'render_output',
+		'click a.insert_quote' : 'render_quote_output',
 		'keyup .quote input.editable' : 'update_model',
 		'keyup .quote textarea.editable' : 'update_model',
-		'change .quote select.editable' : 'update_model'
+		'change .quote select.editable' : 'update_model',
+		'paste .quote .editable' : 'handle_paste',
 	},
 	template : _.template($('#Quote').html()),
 	render:function () {
-		this.$el.html(this.template(this.model.attributes))
+		this.$el.html(this.template(this.model.attributes));
 	},
-	render_output : function () {
-		this.save_view_model(quoteModel)
-		quoteModelOutput = new B.Output.Model.Quote();
-		quoteModelOutput.set(quoteModel.toJSON());
-		quoteModelViewOutput = new B.Output.View.Quote({model:quoteModelOutput});
-		this.render_to_preview(quoteModelViewOutput.render().html());
+	render_quote_output : function () {
+		if(this.save_view_model(quoteModel)){
+			quoteModelOutput = new B.Output.Model.Quote();
+			quoteModelOutput.set(quoteModel.toJSON());
+			quoteModelViewOutput = new B.Output.View.Quote({model:quoteModelOutput});
+			this.render_to_preview(quoteModelViewOutput.render().html());
+		}
 	}
 });
 
@@ -453,7 +497,8 @@ B.Output.Model.SlideImage 	= B.Output.Model.extend({});
 	B.Editor.View.Slides = B.Editor.View.extend({
 		events : {
 			'click a.add_slide' : 'add_slide',
-			'click a.insert_slides' : 'render_output'
+			'click a.insert_slides' : 'render_slides_output',
+
 		},
 		template : _.template($('#Slides').html()),
 		render : function () {
@@ -476,11 +521,13 @@ B.Output.Model.SlideImage 	= B.Output.Model.extend({});
 			this.collection.add(slideImageModel);
 			this.add_one(slideImageModel);
 		},
-		render_output : function () {
-			slidesCollectionOutput = new B.Output.Collection.Slides();
-			slidesCollectionOutput.reset(slidesView.collection.toJSON());
-			slidesViewOutput = new B.Output.View.Slides({collection:slidesCollectionOutput});
-			this.render_to_preview(slidesViewOutput.render().html());
+		render_slides_output : function () {
+			if(this.test_json_encode_decode(slidesView.collection.toJSON())){
+				slidesCollectionOutput = new B.Output.Collection.Slides();
+				slidesCollectionOutput.reset(slidesView.collection.toJSON());
+				slidesViewOutput = new B.Output.View.Slides({collection:slidesCollectionOutput});
+				this.render_to_preview(slidesViewOutput.render().html());
+			}
 		}
 
 	});
@@ -491,7 +538,8 @@ B.Output.Model.SlideImage 	= B.Output.Model.extend({});
 				'keyup .slide_form input.editable' : 'update_model',
 				'keyup .slide_form textarea.editable' : 'update_model',
 				'change .slide_form select.editable' : 'update_model',
-				'click a.delete_slide' : 'delete_slide'
+				'click a.delete_slide' : 'delete_slide',
+				'paste .slide_form .editable' : 'handle_paste',
 			},
 			template : _.template($('#SlideImage').html()),
 			render : function () {
@@ -545,7 +593,8 @@ B.Output.Model.GridImage 	= B.Output.Model.extend({});
 		events : {
 			'click a.add_image' : 'add_image',
 			'click a.insert_grid' : 'render_output',
-			'keyup input.section_heading' : 'save_section_heading'
+			'keyup input.section_heading' : 'save_section_heading',
+			'paste .grid .editable' : 'handle_paste',
 		},
 		template : _.template($('#GridImages').html()),
 		render : function () {
@@ -564,7 +613,7 @@ B.Output.Model.GridImage 	= B.Output.Model.extend({});
 		},
 		add_image : function () {
 			if (this.collection.length < 2) {
-				defaults = {background_image:'', img_alt:'', header:'', paragraph:'',section_heading:''};
+				defaults = {background_image:'',section_link:'', img_alt:'', header:'', paragraph:'',section_heading:''};
 				gridImageModel = new B.Editor.Model.GridImage(defaults);
 				this.collection.add(gridImageModel);
 				this.add_one(gridImageModel);
@@ -582,10 +631,12 @@ B.Output.Model.GridImage 	= B.Output.Model.extend({});
 			model.set('section_heading', this.section_heading);
 		},
 		render_output : function () {
-			gridImagesCollectionOutput = new B.Output.Collection.GridImages();
-			gridImagesCollectionOutput.reset(gridImagesView.collection.toJSON());
-			gridImagesViewOutput = new B.Output.View.GridImages({collection:gridImagesCollectionOutput});
-			this.render_to_preview(gridImagesViewOutput.render().html());
+			if(this.test_json_encode_decode(gridImagesView.collection.toJSON())){
+				gridImagesCollectionOutput = new B.Output.Collection.GridImages();
+				gridImagesCollectionOutput.reset(gridImagesView.collection.toJSON());
+				gridImagesViewOutput = new B.Output.View.GridImages({collection:gridImagesCollectionOutput});
+				this.render_to_preview(gridImagesViewOutput.render().html());
+			}
 		}
 
 	});
@@ -594,7 +645,7 @@ B.Output.Model.GridImage 	= B.Output.Model.extend({});
 				'keyup .grid_form input.editable' : 'update_model',
 				'keyup .grid_form textarea.editable' : 'update_model',
 				'change .grid_form select.editable' : 'update_model',
-				'click a.delete_grid' : 'delete_grid'
+				'click a.delete_grid' : 'delete_grid',
 			},
 			template : _.template($('#GridImage').html()),
 			render : function () {
@@ -658,7 +709,8 @@ B.Output.Model.QuickLink				= B.Output.Model.extend({});
 	B.Editor.View.QuickLinkColumns = B.Editor.View.extend({
 		events : {
 			'click a.add_column' : 'add_column',
-			'click a.insert_quick_links' : 'render_output'
+			'click a.insert_quick_links' : 'render_output',
+
 		},
 		template : _.template($('#QuickLinkColumns').html()),
 		render : function () {
@@ -674,7 +726,7 @@ B.Output.Model.QuickLink				= B.Output.Model.extend({});
 		},
 		add_column : function () {
 			if (this.collection.length < 4) {
-				defaults = {name:'New Column', links:[{url:'example.com', text:'Example Text'}]};
+				defaults = {name:'New Column', column_name_link:'', links:[{url:'', text:''}]};
 				quickLinkColumnModel = new B.Editor.Model.QuickLinkColumn(defaults);
 				this.collection.add(quickLinkColumnModel);
 				this.render();
@@ -683,10 +735,12 @@ B.Output.Model.QuickLink				= B.Output.Model.extend({});
 			}
 		},
 		render_output : function () {
-			quickLinkColumnsModelOutput = new B.Output.Collection.QuickLinkColumns();
-			quickLinkColumnsModelOutput.reset(quickLinkColumnsView.collection.toJSON());
-			quickLinkColumnsViewOutput = new B.Output.View.QuickLinkColumns({collection:quickLinkColumnsModelOutput});
-			this.render_to_preview(quickLinkColumnsViewOutput.render().html());
+			if(this.test_json_encode_decode(quickLinkColumnsView.collection.toJSON())){
+				quickLinkColumnsModelOutput = new B.Output.Collection.QuickLinkColumns();
+				quickLinkColumnsModelOutput.reset(quickLinkColumnsView.collection.toJSON());
+				quickLinkColumnsViewOutput = new B.Output.View.QuickLinkColumns({collection:quickLinkColumnsModelOutput});
+				this.render_to_preview(quickLinkColumnsViewOutput.render().html());
+			}
 		}
 
 	});
@@ -694,8 +748,9 @@ B.Output.Model.QuickLink				= B.Output.Model.extend({});
 		B.Editor.View.QuickLinkColumn = B.Editor.View.QuickLinkColumns.extend({
 
 			events:{
-				'keyup' : 'update_name',
-				'click a.delete_column' : 'delete_column'
+				'keyup .editable' : 'update_model',
+				'click a.delete_column' : 'delete_column',
+				'paste .editable' : 'handle_paste'
 			},
 			template : _.template($('#QuickLinkColumn').html()),
 			render : function () {
@@ -724,9 +779,7 @@ B.Output.Model.QuickLink				= B.Output.Model.extend({});
 
 
 			},
-			update_name : function (){
-				this.model.set('name', this.$el.find('[name="name"]').val());
-			},
+
 			update_parent_collection : function (c) {
 				this.model.set('links', c.collection.toJSON());
 			},
@@ -762,8 +815,8 @@ B.Output.Model.QuickLink				= B.Output.Model.extend({});
 				B.Editor.View.QuickLink = B.Editor.View.QuickLinkColumns.extend({
 					tagName : 'tr',
 					events : {
-						'keyup' : 'update_link',
-						'click a.delete_link' : 'delete_link'
+						'keyup .editable' : 'update_link',
+						'click a.delete_link' : 'delete_link',
 					},
 					template : _.template($('#QuickLink').html()),
 					render : function () {

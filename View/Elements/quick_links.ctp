@@ -15,8 +15,12 @@
 		<hr />
 		<div class="row">
 			<div class="col-sm-4"><label>Column Name</label></div>
-			<div class="col-sm-6"><input class="form-control" type="text" name="name" value="<%= name %>" /></div>
-			<div class="col-sm-2"><a href="javascript:void(0)" class="delete_column glyphicon glyphicon-trash" /></div>
+			<div class="col-sm-6"><input class="editable form-control" type="text" name="name" value="<%= name %>" /></div>
+			<div class="col-sm-2"><a href="javascript:void(0)" class="delete_column glyphicon glyphicon-trash"  title="delete column" /></div>
+		</div>
+		<div class="row">
+			<div class="col-sm-4"><label>Column Name Link</label></div>
+			<div class="col-sm-8"><input class="editable form-control" type="text" name="column_name_link" value="<%= column_name_link %>" /></div>
 		</div>
 
 		<table class="links_region"></table>
@@ -33,8 +37,8 @@
 		</script>
 
 			<script type="text/template" id="QuickLink">
-				<td><input class="form-control" type="text" name="text" value="<%= text %>" /></td>
-				<td><input class="form-control" type="text" name="url" value="<%= url %>" /></td>
+				<td><input class="editable form-control" type="text" name="text" value="<%= text %>" /></td>
+				<td><input class="editable form-control" type="text" name="url" value="<%= url %>" /></td>
 				<td><a href="javascript:void(0)" class="delete_link glyphicon glyphicon-trash"></a></td>
 			</script>
 
@@ -54,7 +58,7 @@
 
 	<script type="text/template" id="OutputQuickLinkColumn">
 			<div class="cont output_links_region">
-				<h2><%= name %></h2>
+				<h2><a href="<%= column_name_link %>"><%= name %></a></h2>
 			</div>
 	</script>
 
