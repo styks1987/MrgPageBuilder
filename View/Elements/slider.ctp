@@ -80,9 +80,15 @@
 		<div class="pic"><img src="<%= background_image %>" alt="<%= img_alt %>"></div>
 		<div class="caption"><%= caption %></div>
 		<div class="cont">
-			<h3><%= overlay_title %></h3>
-			<p><%= overlay_text %></p>
-			<a href="<%= cta_link %>" class="btn btn-primary"><%= cta_text %></a>
+			<% if(overlay_title != '') { %>
+				<h3><%= overlay_title %></h3>
+			<% } %>
+			<% if(overlay_text != '') { %>
+				<p><%= overlay_text %></p>
+			<% } %>
+			<% if(cta_text != ''){ %>
+				<a href="<%= cta_link %>" class="btn btn-primary"><%= cta_text %></a>
+			<% } %>
 		</div>
 	</script>
 
