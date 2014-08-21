@@ -47,7 +47,7 @@
 	<div class="quick_links block" data-block_type="quick_links">
 		<input type='hidden' name="model" value='<%= model_json %>' />
 		<div class="container">
-			<h1>Quick Links</h1>
+			<!--<h1>Quick Links</h1>-->
 			<div class="row">
 				<div class="col-md-6" id="output_column_region_1"></div>
 				<div class="col-md-6" id="output_column_region_2"></div>
