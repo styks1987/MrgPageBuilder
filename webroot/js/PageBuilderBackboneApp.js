@@ -236,7 +236,7 @@ B.Output.View = Backbone.View.extend({
 				this.hide_dropzones();
 				$(this.render()).insertBefore('.block');
 			}else{
-				$('#output_region').html('<div class="output_toolbar_wrapper"><a class="btn btn-primary insert_content" href="javascript:void(0)">Insert Contente</a></div>');
+				$('#output_region').html('<div class="output_toolbar_wrapper"><a class="btn btn-primary insert_content" href="javascript:void(0)">Insert Content</a></div>');
 				$('#output_region a.insert_content').click(function(e){
 					this.show_editor(e);
 
