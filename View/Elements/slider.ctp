@@ -60,7 +60,7 @@
 
 <script type="text/template" id="OutputSlides">
 	<div class="highlights block slides" data-block_type="slides">
-		<input type='hidden' name="model" value='<%= model_json %>' />
+		<textarea style="display: none;" name="model" ><%= model_json %></textarea>
 		<div class="carousel" data-jcarousel="true">
 			<ul class="slider_images_region"></ul>
 		</div>
