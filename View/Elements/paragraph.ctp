@@ -19,7 +19,7 @@
 
 <script type="text/template" id="ParagraphOutput">
 	<div class="paragraph container block" data-block_type="paragraph">
-		<input type='hidden' name="model" value='<%= model_json %>' />
+		<textarea style="display: none;" name="model" ><%= model_json %></textarea>
 		<h1><%= header %></h1>
 		<p class="intro"><%= paragraph %></p>
 	</div>

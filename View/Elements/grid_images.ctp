@@ -58,7 +58,7 @@
 
 <script type="text/template" id="OutputGridImages">
 	<div class="grid_images block program" data-block_type="grid_images">
-		<input type='hidden' name="model" value='<%= model_json %>' />
+		<textarea style="display: none;" name="model" ><%= model_json %></textarea>
 		<h3><%= section_heading %></h3>
 		<div class="grid_images_region row"></div>
 	</div>

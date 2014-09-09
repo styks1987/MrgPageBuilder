@@ -17,7 +17,7 @@
 
 <script type="text/template" id="QuoteOutput">
 	<div class="testimonial block" data-block_type="quote">
-		<input type='hidden' name="model" value='<%= model_json %>' />
+		<textarea style="display: none;" name="model" ><%= model_json %></textarea>
 		<div class="container">
 			<div class="txt field" data-type="text">&quot;<%= quote_text %>&quot;</div>
 			<div class="source field" data-type="varchar">&mdash; <%= quote_name %></div>
