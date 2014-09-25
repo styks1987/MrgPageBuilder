@@ -1,5 +1,5 @@
 .editor_region_outer{position: static;}
-.editor_region{position: absolute; top: 0; left: 50%; margin-left:-400px; padding: 20px;   width:800px; z-index: 1000; }
+.editor_region{position: absolute; top: 0; left: 50%; margin-left:-400px; width:800px; z-index: 1000; }
 .editor_region .row{margin-bottom:20px;}
 .editor_region td{padding: 10px;}
 .editor_region .block_chooser{padding: 20px;background:#FFF; margin-bottom:20px; border:solid 1px #ccc;}
