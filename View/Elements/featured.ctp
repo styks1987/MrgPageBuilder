@@ -79,5 +79,6 @@
 				<a data-name="cta" href="<%= cta_link %>" class="btn btn-primary"><%= cta_text %></a>
 			</div>
 		</div>
+		<a href="#" class="arw_scroll"></a>
 	</div>
 </script>
