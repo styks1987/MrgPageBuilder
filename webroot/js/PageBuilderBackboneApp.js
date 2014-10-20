@@ -355,7 +355,7 @@ B.Output.View.ParagraphImage = B.Output.View.extend({
 
 
 // BEGIN TEXT and PARAGRAPH
-B.Editor.Model.Paragraph = B.Editor.Model.extend({defaults:{header:'Headline', paragraph:'An example paragraph'}});
+B.Editor.Model.Paragraph = B.Editor.Model.extend({defaults:{header:'Headline', paragraph:'An example paragraph', cta_1_text:'',cta_1_link:'',cta_2_text:'',cta_2_link:''}});
 B.Output.Model.Paragraph = B.Output.Model.extend();
 
 B.Editor.View.Paragraph = B.Editor.View.extend({

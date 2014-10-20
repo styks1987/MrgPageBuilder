@@ -12,6 +12,33 @@
 			<div class="col-sm-12"><textarea width=100% name="paragraph" class="editable form-control" ><%= paragraph %></textarea></div>
 		</div>
 		<div class="row">
+			<div class="col-sm-12"><label>Call to Action 1</label></div>
+		</div>
+		<div class="row">
+			<div class="col-sm-6">
+				<label>CTA 1 Text</label>
+				<input class="form-control editable" type="text" name="cta_1_text" value="<%= cta_1_text %>" />
+			</div>
+			<div class="col-sm-6">
+				<label>CTA 1 URL</label>
+				<input class="form-control editable" type="text" name="cta_1_link" value="<%= cta_1_link %>" />
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-sm-12"><label>Call to Action 2</label></div>
+		</div>
+		<div class="row">
+			<div class="col-sm-6">
+				<label>CTA 2 Text</label>
+				<input class="form-control editable" type="text" name="cta_2_text" value="<%= cta_2_text %>" />
+			</div>
+			<div class="col-sm-6">
+				<label>CTA 2 URL</label>
+				<input class="form-control editable" type="text" name="cta_2_link" value="<%= cta_2_link %>" />
+			</div>
+		</div>
+
+		<div class="row">
 			<div class="col-sm-6"><a href="javascript:void(0)" class="btn btn-primary insert_paragraph">Insert Into Page</a></div>
 		</div>
 	</div>
@@ -22,6 +49,14 @@
 		<textarea style="display: none;" name="model" ><%= model_json %></textarea>
 		<h1><%= header %></h1>
 		<p class="intro"><%= paragraph %></p>
+
+		<% if(cta_1_link != ''){ %>
+			<a data-name="cta" href="<%= cta_1_link %>" class="btn btn-primary"><%= cta_1_text %></a>
+		<% } %>
+
+		<% if(cta_2_link != ''){ %>
+			<a data-name="cta" href="<%= cta_2_link %>" class="btn btn-primary"><%= cta_2_text %></a>
+		<% } %>
 	</div>
 </script>
 
