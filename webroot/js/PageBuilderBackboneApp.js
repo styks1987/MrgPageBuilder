@@ -365,6 +365,7 @@ B.Editor.View.Paragraph = B.Editor.View.extend({
 		'focus [data-linked-input]' : 'enable_link',
 		'blur [data-linked-input]' : 'disable_link',
 		'mousedown .add_link' : 'add_link',
+		'mousedown .remove_link' : 'remove_link',
 		'keyup .paragraph input.editable' : 'update_model',
 		'keyup .paragraph textarea.editable' : 'update_model',
 		'change .paragraph select.editable' : 'update_model',
@@ -379,10 +380,15 @@ B.Editor.View.Paragraph = B.Editor.View.extend({
 	},
 	add_link : function (e) {
 		e.preventDefault();
-		var link = prompt('Please specify the link.');
+		var link = prompt('Please specify the link. Use "/" to specify urls on the site. Leave blank to remove a link.');
 		if(link){
 			document.execCommand('createLink', false, link);
+		}else{
+			document.execCommand('unlink', false, link);
 		}
+	},
+	remove_link : function (e) {
+
 	},
 	update_linked_input : function (e) {
 		input_name = $(e.target).data('linked-input');
