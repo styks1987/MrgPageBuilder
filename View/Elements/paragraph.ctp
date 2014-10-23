@@ -9,7 +9,11 @@
 			<div class="col-sm-12"><label>Paragraph</label></div>
 		</div>
 		<div class="row">
-			<div class="col-sm-12"><textarea width=100% name="paragraph" class="editable form-control" ><%= paragraph %></textarea></div>
+			<div class="col-sm-12">
+				<button data-tag="createLink" class="btn btn-primary add_link">Add Link</button>
+				<div style="padding:10px; margin-top:10px;" contenteditable="true" data-linked-input="paragraph"><%= paragraph %></div>
+				<textarea style="visibility: hidden;" width=100% name="paragraph" class="editable form-control" contenteditable="true" ><%= paragraph %></textarea>
+			</div>
 		</div>
 		<div class="row">
 			<div class="col-sm-12"><label>Call to Action 1</label></div>

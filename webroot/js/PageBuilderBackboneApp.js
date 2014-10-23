@@ -361,12 +361,36 @@ B.Output.Model.Paragraph = B.Output.Model.extend();
 B.Editor.View.Paragraph = B.Editor.View.extend({
 	events : {
 		'click a.insert_paragraph' : 'render_paragraph_output',
+		'input [data-linked-input]' : 'update_linked_input',
+		'focus [data-linked-input]' : 'enable_link',
+		'blur [data-linked-input]' : 'disable_link',
+		'mousedown .add_link' : 'add_link',
 		'keyup .paragraph input.editable' : 'update_model',
 		'keyup .paragraph textarea.editable' : 'update_model',
 		'change .paragraph select.editable' : 'update_model',
 		'paste .paragraph .editable' : 'handle_paste',
 	},
 	template : _.template($('#Paragraph').html()),
+	enable_link : function (e){
+		this.$el.find('.add_link').show();
+	},
+	disable_link : function (e){
+		this.$el.find('.add_link').hide();
+	},
+	add_link : function (e) {
+		e.preventDefault();
+		var link = prompt('Please specify the link.');
+		if(link){
+			document.execCommand('createLink', false, link);
+		}
+	},
+	update_linked_input : function (e) {
+		input_name = $(e.target).data('linked-input');
+		value = $(e.target).html();
+		item = {currentTarget:this.$el.find('[name='+input_name+']')}
+		item.currentTarget.val(value)
+		this.update_model(item);
+	},
 	render:function () {
 		this.model.set('model_json', JSON.stringify(this.model.toJSON()));
 		this.$el.html(this.template(this.model.attributes))
