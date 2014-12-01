@@ -197,7 +197,13 @@ B.Output.View = Backbone.View.extend({
 		outputToolbarView.show_dropzones();
 	},
 	scroll_to : function(el, offset){
-		$('html,body').animate({ scrollTop: el.offset().top - offset});
+		if (typeof offset == 'undefined') {
+			offset = 0;
+		}
+		if (typeof el != 'undefined') {
+			offset = el.offset().top - offset
+			$('html,body').animate({ scrollTop: offset});
+		}
 	},
 	print_stack_trace : function (e) {
 		return printStackTrace({e:e});
@@ -255,7 +261,14 @@ B.Output.View = Backbone.View.extend({
 				$(this.current_block).remove();
 				$(this.insert_location).after(preview_html);
 			}else{
-				$(this.insert_location).before(preview_html);
+				if ($(this.insert_location).next('.block').is('*')) {
+					$(this.insert_location).next('.block').after(preview_html);
+					this.scroll_to($(this.insert_location).next('.block').next());
+				}else{
+					$(this.insert_location).before(preview_html);
+					this.scroll_to($('#html_region'));
+				}
+
 			}
 			this.save();
 		},
@@ -305,6 +318,7 @@ B.Output.View = Backbone.View.extend({
 			if ($(new_position).is('*')) {
 				block.insertAfter(new_position);
 				toolbar.insertBefore(block);
+				this.scroll_to(toolbar);
 				this.save();
 			}else{
 				alert('This block cannot move any lower');
@@ -844,7 +858,7 @@ B.Output.Model.QuickLink				= B.Output.Model.extend({});
 					quickLinkModel.destroy();
 
 					quickLink = new B.Editor.View.QuickLink({model:link});
-					this.$el.find('tr:first-of-type').after(quickLink.render());
+					this.$el.find('tr:last-of-type').before(quickLink.render());
 				},
 				add_all : function () {
 					this.collection.forEach(this.add_one, this);

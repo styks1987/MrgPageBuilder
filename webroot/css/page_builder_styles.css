@@ -8,7 +8,7 @@
 .editor_region .input_wrapper .dropbox .message{font-size: 20px;color: #a5a5a5;}
 .editor_region .input_wrapper .dropbox .message img{width: 100px;display: block;margin: 0 auto 20px auto;}
 
-.editor_region .add_link{display: none;position: absolute;right: 14px;top: -23px;}
+.editor_region .paragraph .add_link{display: none;position: absolute;right: 14px;top: -23px;}
 
 
 .page_builder .output_toolbar_wrapper {margin-top:20px; padding: 2px 0; border-top: solid 1px #000;}
