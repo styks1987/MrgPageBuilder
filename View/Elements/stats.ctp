@@ -13,19 +13,25 @@
 		</div>
 		<div class="row">
 			<div class="col-sm-12"><label>Statistic Column 2</label></div>
-			<div class="col-sm-12"><input class="form-control editable" type="text" name="stat_2" value="<%= stat_2 %>" /></div>
-			<div class="col-sm-12"><input class="form-control editable" type="text" name="stat_2_header" value="<%= stat_2_header %>" /></div>
-			<div class="col-sm-12"><input class="form-control editable" type="text" name="stat_2_detail" value="<%= stat_2_detail %>" /></div>
+			<div class="row">
+				<div class="col-sm-6"><input class="form-control editable" type="text" name="stat_2" value="<%= stat_2 %>" /></div>
+				<div class="col-sm-6"><input class="form-control editable" type="text" name="stat_2_header" value="<%= stat_2_header %>" /></div>
+			</div>
+			<div class="row">
+				<div class="col-sm-12"><input class="form-control editable" type="text" name="stat_2_detail" value="<%= stat_2_detail %>" /></div>
+			</div>
 		</div>
 		<div class="row">
 			<div class="col-sm-12"><label>Statistic Column 3</label></div>
-			<div class="col-sm-12"><input class="form-control editable" type="text" name="stat_3" value="<%= stat_3 %>" /></div>
-			<div class="col-sm-12"><input class="form-control editable" type="text" name="stat_3_header" value="<%= stat_3_header %>" /></div>
-			<div class="col-sm-12"><input class="form-control editable" type="text" name="stat_3_detail" value="<%= stat_3_detail %>" /></div>
+			<div class="row">
+				<div class="col-sm-6"><input class="form-control editable" type="text" name="stat_3" value="<%= stat_3 %>" /></div>
+				<div class="col-sm-6"><input class="form-control editable" type="text" name="stat_3_header" value="<%= stat_3_header %>" /></div>
+			</div>
+			<div class="row">
+				<div class="col-sm-12"><input class="form-control editable" type="text" name="stat_3_detail" value="<%= stat_3_detail %>" /></div>
+			</div>
 		</div>
-		<div class="row">
-			<div class="col-sm-6"><a href="javascript:void(0)" class="btn btn-primary insert_statistics">Insert Into Page</a></div>
-		</div>
+		
 	</div>
 </script>
 
