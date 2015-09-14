@@ -110,6 +110,18 @@ B.Editor.View = Backbone.View.extend({
 				}
 				paragraphView.render();
 				break;
+			case 'stats':
+				if (typeof statsView == 'undefined') {
+					statsModel = new B.Editor.Model.Stats();
+					statsView = new B.Editor.View.Stats({model:statsModel, el:'#input_region'});
+				}else{
+					statsView.setElement('#input_region');
+				}
+				if (typeof data != 'undefined') {
+					statsModel.set(data);
+				}
+				statsView.render();
+				break;
 			case 'paragraph_image':
 				if (typeof paragraphImageView == 'undefined') {
 					paragraphImageModel = new B.Editor.Model.ParagraphImage();
@@ -628,6 +640,45 @@ B.Output.Model.SlideImage 	= B.Output.Model.extend({});
 
 
 // END SLIDER
+
+// BEGIN STATISTICS
+// defaults: {header:'Headline', paragraph:'An example paragraph', cta_1_text:'',cta_1_link:'',cta_2_text:'',cta_2_link:''}
+
+B.Editor.Model.Stats = B.Editor.Model.extend({defaults:{stat_1:'test', stat_1_header:'some of thei things', stat_1_detail:'all the data', stat_2:'', stat_2_header:'', stat_2_detail:'',stat_3:'', stat_3_header:'', stat_3_detail:'',}});
+B.Output.Model.Stats = B.Output.Model.extend();
+
+B.Editor.View.Stats = B.Editor.View.extend({
+	events : {
+		'click a.insert_statistics' : 'render_statistics_output',
+		'keyup .stats input.editable' : 'update_model',
+		'keyup .stats textarea.editable' : 'update_model',
+		'change .stats select.editable' : 'update_model',
+		'paste .stats .editable' : 'handle_paste',
+	},
+	template : _.template($('#Stats').html()),
+	render:function () {
+		this.model.set('model_json', JSON.stringify(this.model.toJSON()));
+		this.$el.html(this.template(this.model.attributes))
+	},
+	render_statistics_output : function () {
+		if(this.save_view_model(statsModel)){
+			statsModelOutput = new B.Output.Model.Stats();
+			statsModelOutput.set(statsModel.toJSON());
+			statsModelViewOutput = new B.Output.View.Stats({model:statsModelOutput});
+			this.render_to_preview(statsModelViewOutput.render().html());
+		}
+	}
+});
+
+B.Output.View.Stats = B.Output.View.extend({
+	initialize:function(){},
+	template : _.template($('#StatsOutput').html()),
+	render:function () {
+		return this.$el.html(this.template(this.model.attributes))
+	}
+})
+
+// END STATISTICS
 
 
 // BEGIN Paragraph Image Above
