@@ -76,15 +76,15 @@ B.Editor.View = Backbone.View.extend({
 				break;
 			case 'columns':
 				if (typeof columnsView == 'undefined') {
-					columnsCollection = new B.Editor.Collection.Columns();
-					columnsView = new B.Editor.View.Columns({collection:columnsCollection, el:'#input_region'});
+					columnsModel = new B.Editor.Model.Columns();
+					columnsView = new B.Editor.View.Columns({model:columnsModel, el:'#input_region'});
 				}else{
 					columnsView.setElement('#input_region');
 				}
 				if (typeof data != 'undefined') {
-					columnsCollection.reset(data);
+					columnsModel.set(data);
 				}
-				slidesView.render();
+				columnsView.render();
 				break;
 			case 'quote':
 				if (typeof quoteView == 'undefined') {
@@ -652,6 +652,47 @@ B.Output.Model.SlideImage 	= B.Output.Model.extend({});
 
 
 // END SLIDER
+
+// BEGIN COLUMNS
+B.Editor.Model.Columns = B.Editor.Model.extend({defaults: {}});
+B.Output.Model.Columns = B.Output.Model.extend();
+
+	B.Editor.View.Columns = B.Editor.View.extend({
+	events : {
+		'click a.insert_paragraph_image' : 'render_paragraph_image_output',
+		'keyup .paragraph_image input.editable' : 'update_model',
+		'keyup .paragraph_image textarea.editable' : 'update_model',
+		'change .paragraph_image select.editable' : 'update_model',
+		'paste .paragraph_image .editable' : 'handle_paste',
+	},
+	template : _.template($('#Columns').html()),
+	render:function () {
+		this.$el.html(this.template(this.model.attributes));
+		featuredImageView = new B.Editor.View.FeaturedImageView({model:this.model, el:'.image_region'});
+		featuredImageView.render();
+	},
+	render_paragraph_image_output : function () {
+		if(this.save_view_model(paragraphImageModel)){
+			columnsModelOutput = new B.Output.Model.Columns();
+			columnsModelOutput.set(columnsModel.toJSON());
+			columnsModelViewOutput = new B.Output.View.Columns({model:columnsModelOutput});
+			this.render_to_preview(columnsModelViewOutput.render().html());
+		}
+	}
+});
+
+B.Output.View.Columns = B.Output.View.extend({
+	initialize:function(){},
+	template : _.template($('#ColumnsOutput').html()),
+	render:function () {
+		return this.$el.html(this.template(this.model.attributes))
+	}
+})
+
+// END TEXT and PARAGRAPH
+
+
+// END COLUMNS
 
 // BEGIN STATISTICS
 // defaults: {header:'Headline', paragraph:'An example paragraph', cta_1_text:'',cta_1_link:'',cta_2_text:'',cta_2_link:''}
