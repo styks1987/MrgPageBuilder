@@ -74,6 +74,18 @@ B.Editor.View = Backbone.View.extend({
 				}
 				slidesView.render();
 				break;
+			case 'columns':
+				if (typeof columnsView == 'undefined') {
+					columnsCollection = new B.Editor.Collection.Columns();
+					columnsView = new B.Editor.View.Columns({collection:columnsCollection, el:'#input_region'});
+				}else{
+					columnsView.setElement('#input_region');
+				}
+				if (typeof data != 'undefined') {
+					columnsCollection.reset(data);
+				}
+				slidesView.render();
+				break;
 			case 'quote':
 				if (typeof quoteView == 'undefined') {
 					quoteModel = new B.Editor.Model.Quote();
