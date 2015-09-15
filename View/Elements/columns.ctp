@@ -1,81 +1,73 @@
 <script type="text/template" id="Columns">
 	<div class="input_wrapper columns">
 		<div class="row">
-			<div class="col-sm-12"><h2>Three Column Content</h2></div>
-		</div>
-		<div class="row"><div class="col-sm-12"><h3>Column 1</h3></div></div>
-		<div class="row">
-			<div class="col-sm-6"><label>Header</label></div>
-			<div class="col-sm-6"><input class="form-control editable"  type="text" name="col_1_header" value="<%= col_1_header %>" /></div>
-			<div class="col-sm-6"><label>Teaser</label></div>
-			<div class="col-sm-6"><input class="form-control editable"  type="text" name="col_1_detail" value="<%= col_1_detail %>" /></div>
-			<div class="col-sm-6"><label>Call to Action Link</label></div>
-			<div class="col-sm-6"><input class="form-control editable"  type="text" name="col_1_link" value="<%= col_1_link %>" /></div>
-			<div class="col-sm-6"><label>Call to Action Text</label></div>
-			<div class="col-sm-6"><input class="form-control editable"  type="text" name="col_1_link_text" value="<%= col_1_link_text %>" /></div>
+			<div class="col-sm-6"><h2>Grid Images</h2></div>
+			<div class="col-sm-6"><h2><a class="btn btn-primary add_image" href="javascript:void(0)">Add Image</a></h2></div>
 		</div>
 		<div class="row">
-			<div class="col-sm-6">
-				<label>Image Alt Text</label>
-				<input class="form-control editable" type="text" name="col_1_image_alt_text" value="<%= col_1_image_alt_text %>" />
+			<div class="col-sm-12">
+				<h2>Section Title</h2>
+				<p>This appears above the images. Leave this blank if you dont want this section to have a title</p>
 			</div>
 		</div>
 		<div class="row">
 			<div class="col-sm-12">
-				<div class="image_region"></div>
+				<input class="section_heading form-control" name="section_heading" value="<%= section_heading %>" />
 			</div>
 		</div>
-		<div class="row"><div class="col-sm-12"><h3>Column 2</h3></div></div>
+		<div id="grid_image_region"></div>
 		<div class="row">
-			<div class="col-sm-6"><label>Header</label></div>
-			<div class="col-sm-6"><input class="form-control editable"  type="text" name="col_2_header" value="<%= col_2_header %>" /></div>
-			<div class="col-sm-6"><label>Teaser</label></div>
-			<div class="col-sm-6"><input class="form-control editable"  type="text" name="col_2_detail" value="<%= col_2_detail %>" /></div>
-			<div class="col-sm-6"><label>Call to Action Link</label></div>
-			<div class="col-sm-6"><input class="form-control editable"  type="text" name="col_2_link" value="<%= col_2_link %>" /></div>
-			<div class="col-sm-6"><label>Call to Action Text</label></div>
-			<div class="col-sm-6"><input class="form-control editable"  type="text" name="col_2_link_text" value="<%= col_2_link_text %>" /></div>
-		</div>
-		<div class="row">
-			<div class="col-sm-6">
-				<label>Image Alt Text</label>
-				<input class="form-control editable" type="text" name="col_2_image_alt_text" value="<%= col_2_image_alt_text %>" />
-			</div>
-		</div>
-		<div class="row">
-			<div class="col-sm-12">
-				<div class="image_region"></div>
-			</div>
-		</div>
-		<div class="row">
-			<div class="col-sm-6"><a href="javascript:void(0)" class="btn btn-primary insert_columns">Insert Into Page</a></div>
+			<div class="col-sm-6"><a href="javascript:void(0)" class="btn btn-primary insert_grid">Insert Into Page</a></div>
 		</div>
 	</div>
 </script>
 
-<script type="text/template" id="ColumnsOutput">
-	<div class="columns block" data-block_type="columns">
-		<textarea style="display: none;" name="model" ><%= model_json %></textarea>
-		<div class="container">
+	<script type="text/template" id="Column">
+		<hr />
+		<div class="grid_form">
 			<div class="row">
-				<div class="col-sm-4 col-md-4">
-					<div class="column-inner">
-						<img class="column-img" src="<%= background_image %>" alt="<%= col_1_image_alt_text %>">
-						<p class="column-header"><%= col_1_header %></p>
-						<p class="stat-detail"><%= col_1_detail %></p>
-						<a class="col-cta" href="<%= col_1_link %>"><%= col_1_link_text %></a>
-					</div>
+				<div class="col-sm-4"><label>Header</label></div>
+				<div class="col-sm-6"><input class="form-control editable" type="text" name="header" value="<%= header %>" /></div>
+				<div class="col-sm-2"><a href="javascript:void(0)" class="delete_grid glyphicon glyphicon-trash" /></div>
+			</div>
+			<div class="row">
+				<div class="col-sm-4"><label>Section Link</label></div>
+				<div class="col-sm-8">
+					<input class="form-control editable" type="text" name="section_link" value="<%= section_link %>" />
 				</div>
-				<div class="col-sm-4 col-md-4">
-					<div class="column-inner">
-						<img class="column-img" src="<%= col_image_2 %>" alt="<%= col_image_2_alt_text %>">
-						<p class="column-header"><%= col_2_header %></p>
-						<p class="stat-detail"><%= col_2_detail %></p>
-						<a class="col-cta" href="<%= col_2_link %>"><%= col_2_link_text %></a>
-					</div>
+			</div>
+
+			<div class="row">
+				<div class="col-sm-12"><label>Paragraph</label></div>
+			</div>
+			<div class="row">
+				<div class="col-sm-12"><textarea class="form-control editable" name="paragraph" ><%= paragraph %></textarea></div>
+			</div>
+
+			<div class="row">
+				<div class="col-sm-6">
+					<label>Image Alt</label>
+					<input class="form-control editable" type="text" name="img_alt" value="<%= img_alt %>" />
 				</div>
-				
+
 			</div>
 		</div>
+
+		<div class="column_image_region"></div>
+	</script>
+
+<script type="text/template" id="OutputColumns">
+	<div class="grid_images block program" data-block_type="grid_images">
+		<textarea style="display: none;" name="model" ><%= model_json %></textarea>
+		<h3><%= section_heading %></h3>
+		<div class="grid_images_region row"></div>
 	</div>
 </script>
+
+	<script type="text/template" id="OutputColumn">
+		<div class="pic"><a href="<%= section_link %>"><img width="100%" src="<%= background_image %>" alt="<%= img_alt %>"></a></div>
+		<div class="header"><a href="<%= section_link %>"><%= header %></a></div>
+		<div class="cont">
+			<p><%= paragraph %></p>
+		</div>
+	</script>
