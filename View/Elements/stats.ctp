@@ -31,7 +31,9 @@
 				<div class="col-sm-12"><input class="form-control editable" type="text" name="stat_3_detail" value="<%= stat_3_detail %>" /></div>
 			</div>
 		</div>
-		
+		<div class="row">
+			<div class="col-sm-6"><a href="javascript:void(0)" class="btn btn-primary insert_statistics">Insert Into Page</a></div>
+		</div>
 	</div>
 </script>
 

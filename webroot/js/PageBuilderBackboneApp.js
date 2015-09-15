@@ -644,7 +644,7 @@ B.Output.Model.SlideImage 	= B.Output.Model.extend({});
 // BEGIN STATISTICS
 // defaults: {header:'Headline', paragraph:'An example paragraph', cta_1_text:'',cta_1_link:'',cta_2_text:'',cta_2_link:''}
 
-B.Editor.Model.Stats = B.Editor.Model.extend({defaults:{stat_1:'test', stat_1_header:'some of thei things', stat_1_detail:'all the data', stat_2:'', stat_2_header:'', stat_2_detail:'',stat_3:'', stat_3_header:'', stat_3_detail:'',}});
+B.Editor.Model.Stats = B.Editor.Model.extend({defaults:{stat_1:'Statistic', stat_1_header:'Statistic Header', stat_1_detail:'Statistic detailed information', stat_2:'', stat_2_header:'', stat_2_detail:'',stat_3:'', stat_3_header:'', stat_3_detail:'',}});
 B.Output.Model.Stats = B.Output.Model.extend();
 
 B.Editor.View.Stats = B.Editor.View.extend({
