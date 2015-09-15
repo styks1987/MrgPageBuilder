@@ -74,18 +74,6 @@ B.Editor.View = Backbone.View.extend({
 				}
 				slidesView.render();
 				break;
-			case 'columns':
-				if (typeof columnsView == 'undefined') {
-					columnsModel = new B.Editor.Model.Columns();
-					columnsView = new B.Editor.View.Columns({model:columnsModel, el:'#input_region'});
-				}else{
-					columnsView.setElement('#input_region');
-				}
-				if (typeof data != 'undefined') {
-					columnsModel.set(data);
-				}
-				columnsView.render();
-				break;
 			case 'quote':
 				if (typeof quoteView == 'undefined') {
 					quoteModel = new B.Editor.Model.Quote();
@@ -145,6 +133,18 @@ B.Editor.View = Backbone.View.extend({
 					paragraphImageModel.set(data);
 				}
 				paragraphImageView.render();
+				break;
+			case 'columns':
+				if (typeof columnsView == 'undefined') {
+					columnsModel = new B.Editor.Model.Columns();
+					columnsView = new B.Editor.View.Columns({model:columnsModel, el:'#input_region'});
+				}else{
+					columnsView.setElement('#input_region');
+				}
+				if (typeof data != 'undefined') {
+					columnsModel.set(data);
+				}
+				columnsView.render();
 				break;
 			case 'grid_images':
 				if (typeof gridImagesView == 'undefined') {
@@ -654,16 +654,16 @@ B.Output.Model.SlideImage 	= B.Output.Model.extend({});
 // END SLIDER
 
 // BEGIN COLUMNS
-B.Editor.Model.Columns = B.Editor.Model.extend({defaults: {}});
+B.Editor.Model.Columns = B.Editor.Model.extend({defaults: {col_1_header: '',col_1_detail: '',col_1_link: '',col_1_link_text: '',col_1_image: '',col_1_image_alt_text: ''}});
 B.Output.Model.Columns = B.Output.Model.extend();
 
 	B.Editor.View.Columns = B.Editor.View.extend({
 	events : {
-		'click a.insert_paragraph_image' : 'render_paragraph_image_output',
-		'keyup .paragraph_image input.editable' : 'update_model',
-		'keyup .paragraph_image textarea.editable' : 'update_model',
-		'change .paragraph_image select.editable' : 'update_model',
-		'paste .paragraph_image .editable' : 'handle_paste',
+		'click a.insert_columns' : 'render_columns_output',
+		'keyup .columns input.editable' : 'update_model',
+		'keyup .columns textarea.editable' : 'update_model',
+		'change .columns select.editable' : 'update_model',
+		'paste .columns .editable' : 'handle_paste',
 	},
 	template : _.template($('#Columns').html()),
 	render:function () {
@@ -671,8 +671,8 @@ B.Output.Model.Columns = B.Output.Model.extend();
 		featuredImageView = new B.Editor.View.FeaturedImageView({model:this.model, el:'.image_region'});
 		featuredImageView.render();
 	},
-	render_paragraph_image_output : function () {
-		if(this.save_view_model(paragraphImageModel)){
+	render_columns_output : function () {
+		if(this.save_view_model(columnsModel)){
 			columnsModelOutput = new B.Output.Model.Columns();
 			columnsModelOutput.set(columnsModel.toJSON());
 			columnsModelViewOutput = new B.Output.View.Columns({model:columnsModelOutput});
@@ -688,10 +688,6 @@ B.Output.View.Columns = B.Output.View.extend({
 		return this.$el.html(this.template(this.model.attributes))
 	}
 })
-
-// END TEXT and PARAGRAPH
-
-
 // END COLUMNS
 
 // BEGIN STATISTICS
