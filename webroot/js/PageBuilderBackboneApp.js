@@ -654,7 +654,12 @@ B.Output.Model.SlideImage 	= B.Output.Model.extend({});
 // END SLIDER
 
 // BEGIN COLUMNS
-B.Editor.Model.Columns = B.Editor.Model.extend({defaults: {col_1_header: '',col_1_detail: '',col_1_link: '',col_1_link_text: '',col_1_image: '',col_1_image_alt_text: ''}});
+B.Editor.Model.Columns = B.Editor.Model.extend({defaults: 
+	{
+		col_1_header: '',col_1_detail: '',col_1_link: '',col_1_link_text: '',background_image: '',col_1_image_alt_text: '',
+		col_2_header: '',col_2_detail: '',col_2_link: '',col_2_link_text: '',background_image: '',col_2_image_alt_text: '',
+		col_3_header: '',col_3_detail: '',col_3_link: '',col_3_link_text: '',background_image: '',col_3_image_alt_text: '',
+	}});
 B.Output.Model.Columns = B.Output.Model.extend();
 
 	B.Editor.View.Columns = B.Editor.View.extend({
