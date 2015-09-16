@@ -19,11 +19,11 @@
 				<div class="col-sm-6"><input class="form-control editable" type="text" name="header" value="<%= header %>" /></div>
 				<div class="col-sm-2"><a href="javascript:void(0)" class="delete_column glyphicon glyphicon-trash" /></div>
 			</div>
+			<div class="row">
+				<div class="col-sm-4"><label>Image Alt</label></div>
+				<div class="col-sm-6"><input class="form-control editable" type="text" name="img_alt" value="<%= img_alt %>" /></div>
+			</div>
 			<div clas="row">
-				<div class="col-sm-6">
-					<label>Image Alt</label>
-					<input class="form-control editable" type="text" name="img_alt" value="<%= img_alt %>" />
-				</div>
 				<div class="column_image_region"></div>
 			</div>
 			<div class="row">
