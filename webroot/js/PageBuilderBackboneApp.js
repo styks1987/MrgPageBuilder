@@ -664,12 +664,11 @@ B.Output.Model.SingleColumn = B.Output.Model.extend({});
 		events : {
 			'click a.add_column' : 'add_column',
 			'click a.insert_column' : 'render_column_output',
-			'keyup input.section_heading' : 'save_section_heading',
 			'paste .column .editable' : 'handle_paste',
 		},
 		template : _.template($('#Columns').html()),
 		render : function () {
-			this.$el.html(this.template({section_heading:''}));
+			this.$el.html(this.template({}));
 			this.add_all();
 			this.delegateEvents();
 		},
@@ -687,23 +686,14 @@ B.Output.Model.SingleColumn = B.Output.Model.extend({});
 			this.collection.forEach(this.add_one, this);
 		},
 		add_column : function () {
-			if (this.collection.length < 3) {
-				defaults = {background_image:'',section_link:'', img_alt:'', header:'', paragraph:'',section_heading:'', col_cta:''};
+			if (this.collection.length != 3) {
+				defaults = {background_image:'',section_link:'', img_alt:'', header:'', paragraph:'', col_cta:''};
 				singleColumnModel = new B.Editor.Model.SingleColumn(defaults);
 				this.collection.add(singleColumnModel);
 				this.add_one(singleColumnModel);
 			}else{
 				alert('You can add up to 3 columns. If you want more, just create another section.');
 			}
-		},
-		// to keep from having to make 2 more views
-		// Just save this to every model
-		save_section_heading : function (e) {
-			this.section_heading = $(e.currentTarget).val();
-			this.collection.forEach(this.set_model_section_heading, this);
-		},
-		set_model_section_heading : function (model) {
-			model.set('section_heading', this.section_heading);
 		},
 		render_column_output : function () {
 			if(this.test_json_encode_decode(columnsView.collection.toJSON())){
@@ -738,8 +728,7 @@ B.Output.Model.SingleColumn = B.Output.Model.extend({});
 		initialize:function(){},
 		template : _.template($('#OutputColumns').html()),
 		render : function () {
-			this.section_heading = this.collection.at(0).get('section_heading');
-			this.$el.html(this.template({section_heading : this.section_heading, model_json:JSON.stringify(this.collection.toJSON())}));
+			this.$el.html(this.template({model_json:JSON.stringify(this.collection.toJSON())}));
 			this.add_all();
 			return this.$el;
 		},
