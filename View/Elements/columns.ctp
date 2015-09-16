@@ -4,6 +4,17 @@
 			<div class="col-sm-6"><h2>Three Column Content</h2></div>
 			<div class="col-sm-6"><h2><a class="btn btn-primary add_column" href="javascript:void(0)">Add Column</a></h2></div>
 		</div>
+		<div class="row">
+			<div class="col-sm-12">
+				<h2>Section Title</h2>
+				<p>This appears above the images. Leave this blank if you dont want this section to have a title</p>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-sm-12">
+				<input class="section_heading form-control" name="section_heading" value="<%= section_heading %>" />
+			</div>
+		</div>
 		<div id="column_region"></div>
 		<div class="row">
 			<div class="col-sm-6"><a href="javascript:void(0)" class="btn btn-primary insert_column">Insert Into Page</a></div>
@@ -11,13 +22,13 @@
 	</div>
 </script>
 
-	<script type="text/template" id="Column">
+	<script type="text/template" id="SingleColumn">
 		<hr />
 		<div class="column_form">
 			<div class="row">
 				<div class="col-sm-4"><label>Column Header</label></div>
 				<div class="col-sm-6"><input class="form-control editable" type="text" name="header" value="<%= header %>" /></div>
-				<div class="col-sm-2"><a href="javascript:void(0)" class="delete_grid glyphicon glyphicon-trash" /></div>
+				<div class="col-sm-2"><a href="javascript:void(0)" class="delete_column glyphicon glyphicon-trash" /></div>
 			</div>
 			<div clas="row">
 				<div class="col-sm-6">
@@ -55,11 +66,12 @@
 <script type="text/template" id="OutputColumns">
 	<div class="columns block" data-block_type="columns">
 		<textarea style="display: none;" name="model" ><%= model_json %></textarea>
+		<h3><%= section_heading %></h3>
 		<div class="columns_region row"></div>
 	</div>
 </script>
 
-	<script type="text/template" id="OutputColumn">
+	<script type="text/template" id="OutputSingleColumn">
 		<a href="<%= section_link %>"><img width="100%" src="<%= background_image %>" alt="<%= img_alt %>"></a>
 		<div class="header"><a href="<%= section_link %>"><%= header %></a></div>
 		<div class="cont">

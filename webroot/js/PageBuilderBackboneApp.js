@@ -655,15 +655,16 @@ B.Output.Model.SlideImage 	= B.Output.Model.extend({});
 
 // BEGIN COLUMNS
 B.Editor.Collection.Columns = B.Editor.Collection.extend({});
-B.Editor.Model.Column 		= B.Editor.Model.extend({defaults:function () {return {background_image:"",section_link:"",img_alt:"",header:"",paragraph:"",col_cta:""}}});
+B.Editor.Model.SingleColumn = B.Editor.Model.extend({defaults:function () {return {background_image:"",section_link:"",img_alt:"",header:"",paragraph:"",col_cta:"",section_heading:"",}}});
 
 B.Output.Collection.Columns = B.Output.Collection.extend({});
-B.Output.Model.Column 		= B.Output.Model.extend({});
+B.Output.Model.SingleColumn = B.Output.Model.extend({});
 
 	B.Editor.View.Columns = B.Editor.View.extend({
 		events : {
 			'click a.add_column' : 'add_column',
 			'click a.insert_column' : 'render_column_output',
+			'keyup input.section_heading' : 'save_section_heading',
 			'paste .column .editable' : 'handle_paste',
 		},
 		template : _.template($('#Columns').html()),
@@ -673,13 +674,13 @@ B.Output.Model.Column 		= B.Output.Model.extend({});
 			this.delegateEvents();
 		},
 		add_one : function (image) {
-			var quickColumnModel = new B.Editor.Model.Column();
-			image.set(_.extend(quickColumnModel.defaults(), image.attributes));
-			quickColumnModel.destroy();
+			var quickSingleColumnModel = new B.Editor.Model.SingleColumn();
+			image.set(_.extend(quickSingleColumnModel.defaults(), image.attributes));
+			quickSingleColumnModel.destroy();
 
-			columnView = new B.Editor.View.Column({model:image})
-			this.$el.find('#column_region').append(columnView.render());
-			featuredImageView = new B.Editor.View.FeaturedImageView({model:columnView.model, el:columnView.$el.find('.column_image_region')});
+			singleColumnView = new B.Editor.View.SingleColumn({model:image})
+			this.$el.find('#column_region').append(singleColumnView.render());
+			featuredImageView = new B.Editor.View.FeaturedImageView({model:singleColumnView.model, el:singleColumnView.$el.find('.column_image_region')});
 			featuredImageView.render();
 		},
 		add_all : function () {
@@ -688,11 +689,11 @@ B.Output.Model.Column 		= B.Output.Model.extend({});
 		add_column : function () {
 			if (this.collection.length < 3) {
 				defaults = {background_image:'',section_link:'', img_alt:'', header:'', paragraph:'',section_heading:'', col_cta:''};
-				columnModel = new B.Editor.Model.Column(defaults);
-				this.collection.add(columnModel);
-				this.add_one(columnModel);
+				singleColumnModel = new B.Editor.Model.SingleColumn(defaults);
+				this.collection.add(singleColumnModel);
+				this.add_one(singleColumnModel);
 			}else{
-				alert('You can add up to 3 column. If you want more, just create another section.');
+				alert('You can add up to 3 columns. If you want more, just create another section.');
 			}
 		},
 		// to keep from having to make 2 more views
@@ -714,14 +715,14 @@ B.Output.Model.Column 		= B.Output.Model.extend({});
 		}
 
 	});
-		B.Editor.View.Column = B.Editor.View.Columns.extend({
+		B.Editor.View.SingleColumn = B.Editor.View.Columns.extend({
 			events:{
 				'keyup .column_form input.editable' : 'update_model',
 				'keyup .column_form textarea.editable' : 'update_model',
 				'change .column_form select.editable' : 'update_model',
 				'click a.delete_column' : 'delete_column',
 			},
-			template : _.template($('#Column').html()),
+			template : _.template($('#SingleColumn').html()),
 			render : function () {
 				this.$el.html(this.template(this.model.attributes));
 
@@ -737,6 +738,8 @@ B.Output.Model.Column 		= B.Output.Model.extend({});
 		initialize:function(){},
 		template : _.template($('#OutputColumns').html()),
 		render : function () {
+			this.section_heading = this.collection.at(0).get('section_heading');
+			this.$el.html(this.template({section_heading : this.section_heading, model_json:JSON.stringify(this.collection.toJSON())}));
 			this.add_all();
 			return this.$el;
 		},
@@ -744,16 +747,16 @@ B.Output.Model.Column 		= B.Output.Model.extend({});
 			column_widths = 12 / this.collection.length;
 
 
-			columnViewOutput = new B.Output.View.Column({model:column, className:'col-sm-'+column_widths});
-			this.$el.find('.column_image_region').append(columnViewOutput.render());
+			singleColumnViewOutput = new B.Output.View.SingleColumn({model:column, className:'col-sm-'+column_widths});
+			this.$el.find('.columns_region').append(singleColumnViewOutput.render());
 		},
 		add_all : function () {
 			this.collection.forEach(this.add_one, this);
 		}
 	});
 
-		B.Output.View.Column = B.Output.View.Columns.extend({
-			template : _.template($('#OutputColumns').html()),
+		B.Output.View.SingleColumn = B.Output.View.Columns.extend({
+			template : _.template($('#OutputSingleColumn').html()),
 			render : function () {
 				return this.$el.html(this.template(this.model.attributes))
 			}
