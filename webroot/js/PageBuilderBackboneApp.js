@@ -134,6 +134,18 @@ B.Editor.View = Backbone.View.extend({
 				}
 				paragraphImageView.render();
 				break;
+			case 'columns':
+				if (typeof columnsView == 'undefined') {
+					columnsCollection = new B.Editor.Collection.Columns();
+					columnsView = new B.Editor.View.Columns({collection:columnsCollection, el:'#input_region'});
+				}else{
+					columnsView.setElement('#input_region');
+				}
+				if (typeof data != 'undefined') {
+					columnsCollection.reset(data);
+				}
+				columnsView.render();
+				break;
 			case 'grid_images':
 				if (typeof gridImagesView == 'undefined') {
 					gridImagesCollection = new B.Editor.Collection.GridImages();
@@ -640,6 +652,105 @@ B.Output.Model.SlideImage 	= B.Output.Model.extend({});
 
 
 // END SLIDER
+
+// BEGIN COLUMNS
+B.Editor.Collection.Columns = B.Editor.Collection.extend({});
+B.Editor.Model.SingleColumn = B.Editor.Model.extend({defaults:function () {return {background_image:"",section_link:"",img_alt:"",header:"",paragraph:"",col_cta:"",section_heading:"",}}});
+
+B.Output.Collection.Columns = B.Output.Collection.extend({});
+B.Output.Model.SingleColumn = B.Output.Model.extend({});
+
+	B.Editor.View.Columns = B.Editor.View.extend({
+		events : {
+			'click a.add_column' : 'add_column',
+			'click a.insert_column' : 'render_column_output',
+			'paste .column .editable' : 'handle_paste',
+		},
+		template : _.template($('#Columns').html()),
+		render : function () {
+			this.$el.html(this.template({}));
+			this.add_all();
+			this.delegateEvents();
+		},
+		add_one : function (image) {
+			var quickSingleColumnModel = new B.Editor.Model.SingleColumn();
+			image.set(_.extend(quickSingleColumnModel.defaults(), image.attributes));
+			quickSingleColumnModel.destroy();
+
+			singleColumnView = new B.Editor.View.SingleColumn({model:image})
+			this.$el.find('#column_region').append(singleColumnView.render());
+			featuredImageView = new B.Editor.View.FeaturedImageView({model:singleColumnView.model, el:singleColumnView.$el.find('.column_image_region')});
+			featuredImageView.render();
+		},
+		add_all : function () {
+			this.collection.forEach(this.add_one, this);
+		},
+		add_column : function () {
+			if (this.collection.length != 3) {
+				defaults = {background_image:'',section_link:'', img_alt:'', header:'', paragraph:'', col_cta:''};
+				singleColumnModel = new B.Editor.Model.SingleColumn(defaults);
+				this.collection.add(singleColumnModel);
+				this.add_one(singleColumnModel);
+			}else{
+				alert('You can add up to 3 columns. If you want more, just create another section.');
+			}
+		},
+		render_column_output : function () {
+			if(this.test_json_encode_decode(columnsView.collection.toJSON())){
+				columnsCollectionOutput = new B.Output.Collection.Columns();
+				columnsCollectionOutput.reset(columnsView.collection.toJSON());
+				columnsViewOutput = new B.Output.View.Columns({collection:columnsCollectionOutput});
+				this.render_to_preview(columnsViewOutput.render().html());
+			}
+		}
+
+	});
+		B.Editor.View.SingleColumn = B.Editor.View.Columns.extend({
+			events:{
+				'keyup .column_form input.editable' : 'update_model',
+				'keyup .column_form textarea.editable' : 'update_model',
+				'change .column_form select.editable' : 'update_model',
+				'click a.delete_column' : 'delete_column',
+			},
+			template : _.template($('#SingleColumn').html()),
+			render : function () {
+				this.$el.html(this.template(this.model.attributes));
+
+				return this.$el
+			},
+			delete_column : function () {
+				this.model.destroy();
+				this.remove();
+			}
+		})
+
+	B.Output.View.Columns = B.Output.View.extend({
+		initialize:function(){},
+		template : _.template($('#OutputColumns').html()),
+		render : function () {
+			this.$el.html(this.template({model_json:JSON.stringify(this.collection.toJSON())}));
+			this.add_all();
+			return this.$el;
+		},
+		add_one : function (column, index) {
+			column_widths = 12 / this.collection.length;
+
+
+			singleColumnViewOutput = new B.Output.View.SingleColumn({model:column, className:'col-sm-'+column_widths});
+			this.$el.find('.columns_region').append(singleColumnViewOutput.render());
+		},
+		add_all : function () {
+			this.collection.forEach(this.add_one, this);
+		}
+	});
+
+		B.Output.View.SingleColumn = B.Output.View.Columns.extend({
+			template : _.template($('#OutputSingleColumn').html()),
+			render : function () {
+				return this.$el.html(this.template(this.model.attributes))
+			}
+		})
+// END COLUMNS
 
 // BEGIN STATISTICS
 // defaults: {header:'Headline', paragraph:'An example paragraph', cta_1_text:'',cta_1_link:'',cta_2_text:'',cta_2_link:''}

@@ -13,6 +13,7 @@
 			<option value="slides">Slider</option>
 			<option value="grid_images">Image Grid</option>
 			<option value="stats">Statistics</option>
+			<option value="columns">Three Column Content</option>
 		</select>
 		<a href="javascript:void(0)" class="glyphicon glyphicon-remove close"></a>
 	</div>
@@ -30,5 +31,6 @@
 <?php echo $this->element('MrgPageBuilder.quote'); ?>
 <?php echo $this->element('MrgPageBuilder.quick_links'); ?>
 <?php echo $this->element('MrgPageBuilder.stats'); ?>
+<?php echo $this->element('MrgPageBuilder.columns'); ?>
 
 
