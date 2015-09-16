@@ -53,7 +53,7 @@
 	</script>
 
 <script type="text/template" id="OutputColumns">
-	<div class="columns block" data-block_type="columns">
+	<div class="columns container block" data-block_type="columns">
 		<textarea style="display: none;" name="model" ><%= model_json %></textarea>
 		<div class="columns_region row"></div>
 	</div>
@@ -66,6 +66,6 @@
 			<p><%= paragraph %></p>
 		</div>
 		<div class="col-cta">
-			<a href="<%= section_link %>" class="col-cta-button"><%= col_cta %></a>
+			<a href="<%= section_link %>" class="btn btn-primary"><%= col_cta %> &raquo;</a>
 		</div>
 	</script>
