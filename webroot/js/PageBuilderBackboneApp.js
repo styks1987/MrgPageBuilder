@@ -134,6 +134,18 @@ B.Editor.View = Backbone.View.extend({
 				}
 				paragraphImageView.render();
 				break;
+			case 'homeRotator':
+				if (typeof homeRotatorView == 'undefined') {
+					homeRotatorCollection = new B.Editor.Collection.HomeRotator();
+					homeRotatorView = new B.Editor.View.HomeRotator({collection:homeRotatorCollection, el:'#input_region'});
+				}else{
+					homeRotatorView.setElement('#input_region');
+				}
+				if (typeof data != 'undefined') {
+					homeRotatorCollection.reset(data);
+				}
+				homeRotatorView.render();
+				break;
 			case 'columns':
 				if (typeof columnsView == 'undefined') {
 					columnsCollection = new B.Editor.Collection.Columns();
@@ -1116,6 +1128,106 @@ B.Output.Model.QuickLink				= B.Output.Model.extend({});
 				})
 
 // END QUICK LINKS
+
+// BEGIN HOME ROTATOR
+B.Editor.Collection.HomeRotator = B.Editor.Collection.extend({});
+B.Editor.Model.HomeImage = B.Editor.Model.extend({defaults:function () {return {background_image:"",section_link:"",img_alt:"",header:"",paragraph:"",section_heading:""}}});
+
+B.Output.Collection.HomeRotator = B.Output.Collection.extend({});
+B.Output.Model.HomeImage = B.Output.Model.extend({});
+
+	B.Editor.View.HomeRotator = B.Editor.View.extend({
+		events : {
+			'click a.add_image' : 'add_image',
+			'click a.insert_image' : 'render_output',
+			'keyup input.section_heading' : 'save_section_heading',
+			'paste .column .editable' : 'handle_paste',
+		},
+		template : _.template($('#HomeRotator').html()),
+		render : function () {
+			this.$el.html(this.template({}));
+			this.add_all();
+			this.delegateEvents();
+		},
+		add_one : function (image) {
+			var quickHomeImageModel = new B.Editor.Model.HomeImage();
+			image.set(_.extend(quickHomeImageModel.defaults(), image.attributes));
+			quickHomeImageModel.destroy();
+
+			homeImageView = new B.Editor.View.HomeImage({model:image})
+			this.$el.find('#images_region').append(homeImageView.render());
+			featuredImageView = new B.Editor.View.FeaturedImageView({model:homeImageView.model, el:homeImageView.$el.find('.image_region')});
+			featuredImageView.render();
+		},
+		add_all : function () {
+			this.collection.forEach(this.add_one, this);
+		},
+		add_column : function () {
+			if (this.collection.length != 3) {
+				defaults = {background_image:'',section_link:'', img_alt:'', header:'', paragraph:'', col_cta:''};
+				singleColumnModel = new B.Editor.Model.HomeImage(defaults);
+				this.collection.add(homeImageModel);
+				this.add_one(homeImageModel);
+			}else{
+				alert('You can add up to 3 columns. If you want more, just create another section.');
+			}
+		},
+		render_output : function () {
+			if(this.test_json_encode_decode(homeRotatorView.collection.toJSON())){
+				homeRotatorCollectionOutput = new B.Output.Collection.HomeRotator();
+				homeRotatorCollectionOutput.reset(homeRotatorView.collection.toJSON());
+				homeRotatorViewOutput = new B.Output.View.HomeRotator({collection:homeRotatorCollectionOutput});
+				this.render_to_preview(homeRotatorViewOutput.render().html());
+			}
+		}
+
+	});
+		B.Editor.View.HomeImage = B.Editor.View.HomeRotator.extend({
+			events:{
+				'keyup .image_form input.editable' : 'update_model',
+				'keyup .image_form textarea.editable' : 'update_model',
+				'change .image_form select.editable' : 'update_model',
+				'click a.delete_image' : 'delete_column',
+			},
+			template : _.template($('#HomeImage').html()),
+			render : function () {
+				this.$el.html(this.template(this.model.attributes));
+
+				return this.$el
+			},
+			delete_column : function () {
+				this.model.destroy();
+				this.remove();
+			}
+		})
+
+	B.Output.View.HomeRotator = B.Output.View.extend({
+		initialize:function(){},
+		template : _.template($('#OutputHomeRotator').html()),
+		render : function () {
+			this.$el.html(this.template({model_json:JSON.stringify(this.collection.toJSON())}));
+			this.add_all();
+			return this.$el;
+		},
+		add_one : function (column, index) {
+			column_widths = 12 / this.collection.length;
+
+
+			homeImageViewOutput = new B.Output.View.HomeImage({model:column, className:'col-sm-'+column_widths});
+			this.$el.find('.homeRotator_region').append(homeImageViewOutput.render());
+		},
+		add_all : function () {
+			this.collection.forEach(this.add_one, this);
+		}
+	});
+
+		B.Output.View.HomeImage = B.Output.View.HomeRotator.extend({
+			template : _.template($('#OutputHomeImage').html()),
+			render : function () {
+				return this.$el.html(this.template(this.model.attributes))
+			}
+		})
+// END HOME ROTATOR
 
 
 // File Uploader
