@@ -1195,6 +1195,13 @@ B.Output.Model.HomeImage = B.Output.Model.extend({});
 			this.section_link = $(e.currentTarget).val();
 			this.collection.forEach(this.set_model_section_link, this);
 		},
+		set_model_section_link : function (model) {
+			model.set('section_link', this.section_link);
+		},
+		save_section_cta : function (e) {
+			this.section_cta = $(e.currentTarget).val();
+			this.collection.forEach(this.set_model_section_cta, this);
+		},
 		set_model_section_cta : function (model) {
 			model.set('section_cta', this.section_cta);
 		},
@@ -1206,7 +1213,6 @@ B.Output.Model.HomeImage = B.Output.Model.extend({});
 				this.render_to_preview(homeRotatorViewOutput.render().html());
 			}
 		}
-
 	});
 		B.Editor.View.HomeImage = B.Editor.View.HomeRotator.extend({
 			events:{

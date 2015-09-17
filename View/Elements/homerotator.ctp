@@ -49,12 +49,15 @@
 	</script>
 
 <script type="text/template" id="OutputHomeRotator">
-	<div class="homeRotator container block" data-block_type="homeRotator">
+	<div class="homeRotator home main hero block" data-block_type="homeRotator">
 		<textarea style="display: none;" name="model" ><%= model_json %></textarea>
-		<div class="container">
-			<h1><%= section_heading %></h1>
-			<p><%= section_subheading %></p>
-			<a href="<%= section_link %>" class="btn btn-primary"><%= section_cta %></a>
+		<div class="bg rotate-bg"></div>
+		<div class="cont">
+			<div class="container">
+				<h1><%= section_heading %></h1>
+				<p><%= section_subheading %></p>
+				<a href="<%= section_link %>" class="btn btn-primary"><%= section_cta %></a>
+			</div>
 		</div>
 		<div class="homeRotator_region row"></div>
 	</div>
