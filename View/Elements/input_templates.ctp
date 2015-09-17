@@ -14,6 +14,7 @@
 			<option value="grid_images">Image Grid</option>
 			<option value="stats">Statistics</option>
 			<option value="columns">Three Column Content</option>
+			<option value="homeRotator">Featured Image Rotator</option>
 		</select>
 		<a href="javascript:void(0)" class="glyphicon glyphicon-remove close"></a>
 	</div>
@@ -32,5 +33,6 @@
 <?php echo $this->element('MrgPageBuilder.quick_links'); ?>
 <?php echo $this->element('MrgPageBuilder.stats'); ?>
 <?php echo $this->element('MrgPageBuilder.columns'); ?>
+<?php echo $this->element('MrgPageBuilder.homeRotator'); ?>
 
 
