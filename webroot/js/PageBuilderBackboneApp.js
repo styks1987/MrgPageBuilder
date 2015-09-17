@@ -1131,7 +1131,7 @@ B.Output.Model.QuickLink				= B.Output.Model.extend({});
 
 // BEGIN HOME ROTATOR
 B.Editor.Collection.HomeRotator = B.Editor.Collection.extend({});
-B.Editor.Model.HomeImage = B.Editor.Model.extend({defaults:function () {return {background_image:"",section_link:"",img_alt:"",header:"",paragraph:"",section_heading:""}}});
+B.Editor.Model.HomeImage = B.Editor.Model.extend({defaults:function () {return {background_image:"",section_link:"",img_alt:"",header:"",paragraph:"",section_heading:"",section_subheading:"",section_cta:""}}});
 
 B.Output.Collection.HomeRotator = B.Output.Collection.extend({});
 B.Output.Model.HomeImage = B.Output.Model.extend({});
@@ -1141,11 +1141,14 @@ B.Output.Model.HomeImage = B.Output.Model.extend({});
 			'click a.add_image' : 'add_image',
 			'click a.insert_image' : 'render_output',
 			'keyup input.section_heading' : 'save_section_heading',
-			'paste .column .editable' : 'handle_paste',
+			'keyup input.section_subheading' : 'save_section_subheading',
+			'keyup input.section_link' : 'save_section_link',
+			'keyup input.section_cta' : 'save_section_cta',
+			'paste .homeRotator .editable' : 'handle_paste',
 		},
 		template : _.template($('#HomeRotator').html()),
 		render : function () {
-			this.$el.html(this.template({section_heading:''}));
+			this.$el.html(this.template({section_heading:'',section_subheading:'',section_link:'',section_cta:''}));
 			this.add_all();
 			this.delegateEvents();
 		},
@@ -1164,7 +1167,7 @@ B.Output.Model.HomeImage = B.Output.Model.extend({});
 		},
 		add_image : function () {
 			if (this.collection.length != 3) {
-				defaults = {background_image:'',section_link:'', img_alt:'', header:'', paragraph:'', col_cta:'',section_heading:''};
+				defaults = {background_image:'',section_link:'', img_alt:'', header:'', paragraph:'', col_cta:'',section_heading:'',section_subheading:'',section_link:'',section_cta:''};
 				homeImageModel = new B.Editor.Model.HomeImage(defaults);
 				this.collection.add(homeImageModel);
 				this.add_one(homeImageModel);
@@ -1175,11 +1178,26 @@ B.Output.Model.HomeImage = B.Output.Model.extend({});
 		// to keep from having to make 2 more views
 		// Just save this to every model
 		save_section_heading : function (e) {
+			console.log(e);
 			this.section_heading = $(e.currentTarget).val();
 			this.collection.forEach(this.set_model_section_heading, this);
 		},
 		set_model_section_heading : function (model) {
 			model.set('section_heading', this.section_heading);
+		},
+		save_section_subheading : function (e) {
+			this.section_subheading = $(e.currentTarget).val();
+			this.collection.forEach(this.set_model_section_subheading, this);
+		},
+		set_model_section_subheading : function (model) {
+			model.set('section_subheading', this.section_subheading);
+		},
+		save_section_link : function (e) {
+			this.section_link = $(e.currentTarget).val();
+			this.collection.forEach(this.set_model_section_link, this);
+		},
+		set_model_section_cta : function (model) {
+			model.set('section_cta', this.section_cta);
 		},
 		render_output : function () {
 			if(this.test_json_encode_decode(homeRotatorView.collection.toJSON())){
@@ -1215,15 +1233,15 @@ B.Output.Model.HomeImage = B.Output.Model.extend({});
 		template : _.template($('#OutputHomeRotator').html()),
 		render : function () {
 			this.section_heading = this.collection.at(0).get('section_heading');
-			this.$el.html(this.template({section_heading : this.section_heading, model_json:JSON.stringify(this.collection.toJSON())}));
+			this.section_subheading = this.collection.at(0).get('section_subheading');
+			this.section_link = this.collection.at(0).get('section_link');
+			this.section_cta = this.collection.at(0).get('section_cta');
+			this.$el.html(this.template({section_heading : this.section_heading, section_subheading : this.section_subheading, section_link : this.section_link, section_cta : this.section_cta, model_json:JSON.stringify(this.collection.toJSON())}));
 			this.add_all();
 			return this.$el;
 		},
 		add_one : function (column, index) {
-			column_widths = 12 / this.collection.length;
-
-
-			homeImageViewOutput = new B.Output.View.HomeImage({model:column, className:'col-sm-'+column_widths});
+			homeImageViewOutput = new B.Output.View.HomeImage({model:column, tagName:'li'});
 			this.$el.find('.homeRotator_region').append(homeImageViewOutput.render());
 		},
 		add_all : function () {
