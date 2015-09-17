@@ -66,6 +66,7 @@
 <script type="text/template" id="OutputHomeRotator">
 	<div class="homeRotator container block" data-block_type="homeRotator">
 		<textarea style="display: none;" name="model" ><%= model_json %></textarea>
+		<h3><%= section_heading %></h3>
 		<div class="homeRotator_region row"></div>
 	</div>
 </script>

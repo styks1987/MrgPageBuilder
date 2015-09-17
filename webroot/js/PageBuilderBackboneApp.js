@@ -1145,7 +1145,7 @@ B.Output.Model.HomeImage = B.Output.Model.extend({});
 		},
 		template : _.template($('#HomeRotator').html()),
 		render : function () {
-			this.$el.html(this.template({}));
+			this.$el.html(this.template({section_heading:''}));
 			this.add_all();
 			this.delegateEvents();
 		},
@@ -1162,15 +1162,24 @@ B.Output.Model.HomeImage = B.Output.Model.extend({});
 		add_all : function () {
 			this.collection.forEach(this.add_one, this);
 		},
-		add_column : function () {
+		add_image : function () {
 			if (this.collection.length != 3) {
-				defaults = {background_image:'',section_link:'', img_alt:'', header:'', paragraph:'', col_cta:''};
-				singleColumnModel = new B.Editor.Model.HomeImage(defaults);
+				defaults = {background_image:'',section_link:'', img_alt:'', header:'', paragraph:'', col_cta:'',section_heading:''};
+				homeImageModel = new B.Editor.Model.HomeImage(defaults);
 				this.collection.add(homeImageModel);
 				this.add_one(homeImageModel);
 			}else{
 				alert('You can add up to 3 columns. If you want more, just create another section.');
 			}
+		},
+		// to keep from having to make 2 more views
+		// Just save this to every model
+		save_section_heading : function (e) {
+			this.section_heading = $(e.currentTarget).val();
+			this.collection.forEach(this.set_model_section_heading, this);
+		},
+		set_model_section_heading : function (model) {
+			model.set('section_heading', this.section_heading);
 		},
 		render_output : function () {
 			if(this.test_json_encode_decode(homeRotatorView.collection.toJSON())){
@@ -1187,7 +1196,7 @@ B.Output.Model.HomeImage = B.Output.Model.extend({});
 				'keyup .image_form input.editable' : 'update_model',
 				'keyup .image_form textarea.editable' : 'update_model',
 				'change .image_form select.editable' : 'update_model',
-				'click a.delete_image' : 'delete_column',
+				'click a.delete_image' : 'delete_image',
 			},
 			template : _.template($('#HomeImage').html()),
 			render : function () {
@@ -1195,7 +1204,7 @@ B.Output.Model.HomeImage = B.Output.Model.extend({});
 
 				return this.$el
 			},
-			delete_column : function () {
+			delete_image : function () {
 				this.model.destroy();
 				this.remove();
 			}
@@ -1205,7 +1214,8 @@ B.Output.Model.HomeImage = B.Output.Model.extend({});
 		initialize:function(){},
 		template : _.template($('#OutputHomeRotator').html()),
 		render : function () {
-			this.$el.html(this.template({model_json:JSON.stringify(this.collection.toJSON())}));
+			this.section_heading = this.collection.at(0).get('section_heading');
+			this.$el.html(this.template({section_heading : this.section_heading, model_json:JSON.stringify(this.collection.toJSON())}));
 			this.add_all();
 			return this.$el;
 		},
