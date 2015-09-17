@@ -1178,7 +1178,6 @@ B.Output.Model.HomeImage = B.Output.Model.extend({});
 		// to keep from having to make 2 more views
 		// Just save this to every model
 		save_section_heading : function (e) {
-			console.log(e);
 			this.section_heading = $(e.currentTarget).val();
 			this.collection.forEach(this.set_model_section_heading, this);
 		},
@@ -1240,21 +1239,14 @@ B.Output.Model.HomeImage = B.Output.Model.extend({});
 			this.add_all();
 			return this.$el;
 		},
-		add_one : function (column, index) {
-			homeImageViewOutput = new B.Output.View.HomeImage({model:column, tagName:'li'});
-			this.$el.find('.homeRotator_region').append(homeImageViewOutput.render());
-		},
 		add_all : function () {
-			this.collection.forEach(this.add_one, this);
+			var background_images = [];
+			this.collection.forEach(function(image, index){
+				background_images.push(image.get('background_image'))
+			}, this);
+			this.$el.find('.homeRotator_region').attr('data-background_images', JSON.stringify(background_images));
 		}
 	});
-
-		B.Output.View.HomeImage = B.Output.View.HomeRotator.extend({
-			template : _.template($('#OutputHomeImage').html()),
-			render : function () {
-				return this.$el.html(this.template(this.model.attributes))
-			}
-		})
 // END HOME ROTATOR
 
 

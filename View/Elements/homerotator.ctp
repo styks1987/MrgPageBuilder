@@ -59,7 +59,3 @@
 		<div class="homeRotator_region row"></div>
 	</div>
 </script>
-
-	<script type="text/template" id="OutputHomeImage">
-		<img width="100%" src="<%= background_image %>" alt="<%= img_alt %>"></a>
-	</script>
