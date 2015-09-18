@@ -134,7 +134,7 @@ B.Editor.View = Backbone.View.extend({
 				}
 				paragraphImageView.render();
 				break;
-			case 'homeRotator':
+			case 'home_rotator':
 				if (typeof homeRotatorView == 'undefined') {
 					homeRotatorCollection = new B.Editor.Collection.HomeRotator();
 					homeRotatorView = new B.Editor.View.HomeRotator({collection:homeRotatorCollection, el:'#input_region'});
