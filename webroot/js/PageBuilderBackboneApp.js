@@ -1144,7 +1144,7 @@ B.Output.Model.HomeImage = B.Output.Model.extend({});
 			'keyup input.section_subheading' : 'save_section_subheading',
 			'keyup input.section_link' : 'save_section_link',
 			'keyup input.section_cta' : 'save_section_cta',
-			'paste .homeRotator .editable' : 'handle_paste',
+			'paste .home_rotator .editable' : 'handle_paste',
 		},
 		template : _.template($('#HomeRotator').html()),
 		render : function () {
@@ -1166,13 +1166,13 @@ B.Output.Model.HomeImage = B.Output.Model.extend({});
 			this.collection.forEach(this.add_one, this);
 		},
 		add_image : function () {
-			if (this.collection.length != 3) {
-				defaults = {background_image:'',section_link:'', img_alt:'', header:'', paragraph:'', col_cta:'',section_heading:'',section_subheading:'',section_link:'',section_cta:''};
+			if (this.collection.length < 4) {
+				defaults = {background_image:'',section_link:'', img_alt:'blank', section_heading:'',section_subheading:'',section_link:'',section_cta:''};
 				homeImageModel = new B.Editor.Model.HomeImage(defaults);
 				this.collection.add(homeImageModel);
 				this.add_one(homeImageModel);
 			}else{
-				alert('You can add up to 3 columns. If you want more, just create another section.');
+				alert('You can add up to 4 images.');
 			}
 		},
 		// to keep from having to make 2 more views
@@ -1250,7 +1250,7 @@ B.Output.Model.HomeImage = B.Output.Model.extend({});
 			this.collection.forEach(function(image, index){
 				background_images.push(image.get('background_image'))
 			}, this);
-			this.$el.find('.homeRotator_region').attr('data-background_images', JSON.stringify(background_images));
+			this.$el.find('.home_rotator_region').attr('data-background_images', JSON.stringify(background_images));
 		}
 	});
 // END HOME ROTATOR

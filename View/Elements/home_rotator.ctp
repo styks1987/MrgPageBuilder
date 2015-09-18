@@ -38,10 +38,6 @@
 	<script type="text/template" id="HomeImage">
 		<hr />
 		<div class="image_form">
-			<div class="row">
-				<div class="col-sm-4"><label>Image Alt</label></div>
-				<div class="col-sm-6"><input class="form-control editable" type="text" name="img_alt" value="<%= img_alt %>" /></div>
-			</div>
 			<div clas="row">
 				<div class="image_region"></div>
 			</div>
@@ -49,7 +45,7 @@
 	</script>
 
 <script type="text/template" id="OutputHomeRotator">
-	<div class="homeRotator home main hero block" data-block_type="home_rotator">
+	<div class="home_rotator home main hero block" data-block_type="home_rotator">
 		<textarea style="display: none;" name="model" ><%= model_json %></textarea>
 		<div class="bg rotate-bg"></div>
 		<div class="cont">
@@ -59,6 +55,6 @@
 				<a href="<%= section_link %>" class="btn btn-primary"><%= section_cta %></a>
 			</div>
 		</div>
-		<div class="homeRotator_region row"></div>
+		<div class="home_rotator_region row"></div>
 	</div>
 </script>
