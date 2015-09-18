@@ -55,6 +55,7 @@
 				<a href="<%= section_link %>" class="btn btn-primary"><%= section_cta %></a>
 			</div>
 		</div>
+		<a href="#" class="arw_scroll"></a>
 		<div class="home_rotator_region row"></div>
 	</div>
 </script>
