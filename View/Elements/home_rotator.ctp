@@ -49,7 +49,7 @@
 	</script>
 
 <script type="text/template" id="OutputHomeRotator">
-	<div class="homeRotator home main hero block" data-block_type="homeRotator">
+	<div class="homeRotator home main hero block" data-block_type="home_rotator">
 		<textarea style="display: none;" name="model" ><%= model_json %></textarea>
 		<div class="bg rotate-bg"></div>
 		<div class="cont">
