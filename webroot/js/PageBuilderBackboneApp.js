@@ -1212,6 +1212,16 @@ B.Output.Model.HomeImage = B.Output.Model.extend({});
 				homeRotatorViewOutput = new B.Output.View.HomeRotator({collection:homeRotatorCollectionOutput});
 				this.render_to_preview(homeRotatorViewOutput.render().html());
 			}
+			var hpStr = $('.home_rotator_region').attr('data-background_images');
+			if(hpStr != undefined){
+				var hpImages = JSON.parse(hpStr);
+				$('.bg.rotate-bg').css('backgroundImage', 'url(' + hpImages[Math.floor(Math.random() * hpImages.length)] + ')');
+			} else{
+				console.log('set');
+				jQuery('.bg.rotate-bg').css('backgroundImage', 'none');
+				$('.home.main.hero .cont h1').css('color', '#144834');
+				$('.home.main.hero .cont p').css('color', '#144834');
+			}
 		}
 	});
 		B.Editor.View.HomeImage = B.Editor.View.HomeRotator.extend({
