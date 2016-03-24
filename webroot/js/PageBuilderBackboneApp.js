@@ -98,6 +98,18 @@ B.Editor.View = Backbone.View.extend({
 				}
 				featuredView.render();
 				break;
+			case 'video':
+				if (typeof videoView == 'undefined') {
+					videoModel = new B.Editor.Model.Video();
+					videoView = new B.Editor.View.Video({model:videoModel, el:'#input_region'});
+				}else{
+					videoView.setElement('#input_region');
+				}
+				if (typeof data != 'undefined') {
+					videoModel.set(data);
+				}
+				videoView.render();
+				break;
 			case 'paragraph':
 				if (typeof paragraphView == 'undefined') {
 					paragraphModel = new B.Editor.Model.Paragraph();
@@ -470,6 +482,45 @@ B.Output.View.Paragraph = B.Output.View.extend({
 })
 
 // END TEXT and PARAGRAPH
+
+
+// BEGIN VIDEO
+B.Editor.Model.Video = B.Editor.Model.extend({defaults:{header:'Headline', subheader:'A specific headline', cta_text:'CTA Text', cta_link:'CTA link', background_image:''}});
+B.Output.Model.Video = B.Output.Model.extend();
+
+B.Editor.View.Video = B.Editor.View.extend({
+	events : {
+		'click a.insert_video' : 'render_video_output',
+		'keyup .video input.editable' : 'update_model',
+		'keyup .video textarea.editable' : 'update_model',
+		'change .video select.editable' : 'update_model',
+		'paste .video .editable' : 'handle_paste',
+	},
+	template : _.template($('#Video').html()),
+	render:function () {
+		this.$el.html(this.template(this.model.attributes))
+		videoImageView = new B.Editor.View.VideoImageView({model:this.model, el:'.image_region'});
+		videoImageView.render();
+	},
+	render_video_output : function () {
+		if(this.save_view_model(videoModel)){
+			videoModelOutput = new B.Output.Model.Video();
+			videoModelOutput.set(videoModel.toJSON());
+			videoModelViewOutput = new B.Output.View.Video({model:videoModelOutput});
+			this.render_to_preview(videoModelViewOutput.render().html());
+		}
+	}
+});
+
+B.Output.View.Video = B.Output.View.extend({
+	initialize:function(){},
+	template : _.template($('#VideoOutput').html()),
+	render:function () {
+		return this.$el.html(this.template(this.model.attributes))
+	}
+})
+
+// END VIDEO
 
 
 // BEGIN FEATURED
@@ -1413,5 +1464,3 @@ B.Editor.View.Uploader = B.Editor.View.extend({
 	outputView.render();
 
 })
-
-
