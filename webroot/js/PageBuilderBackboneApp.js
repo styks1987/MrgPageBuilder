@@ -485,7 +485,7 @@ B.Output.View.Paragraph = B.Output.View.extend({
 
 
 // BEGIN VIDEO
-B.Editor.Model.Video = B.Editor.Model.extend({defaults:{header:'Headline', subheader:'A specific headline', cta_text:'CTA Text', cta_link:'CTA link', background_image:''}});
+B.Editor.Model.Video = B.Editor.Model.extend({defaults:{youtube_url:''}});
 B.Output.Model.Video = B.Output.Model.extend();
 
 B.Editor.View.Video = B.Editor.View.extend({
@@ -499,8 +499,6 @@ B.Editor.View.Video = B.Editor.View.extend({
 	template : _.template($('#Video').html()),
 	render:function () {
 		this.$el.html(this.template(this.model.attributes))
-		videoImageView = new B.Editor.View.VideoImageView({model:this.model, el:'.image_region'});
-		videoImageView.render();
 	},
 	render_video_output : function () {
 		if(this.save_view_model(videoModel)){

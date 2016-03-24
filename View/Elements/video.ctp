@@ -7,8 +7,8 @@
 		</div>
 		<div class="row">
 			<div class="col-sm-12">
-				<label>Embed Code</label>
-				<input class="form-control editable" type="text" name="embed_code" value="<%= embed_code %>" />
+				<label>Youtube URL</label>
+				<input class="form-control editable" type="textarea" name="youtube_url" value="<%= youtube_url %>" />
 			</div>
 		</div>
 		<div class="row">
@@ -22,8 +22,13 @@
 <script type="text/template" id="VideoOutput">
 	<div class="hero main future_students block" data-block_type="video">
 		<textarea style="display: none;" name="model" ><%= model_json %></textarea>
-		<div class="player">
-			<%= embed_code %>
+		<%
+		var url = youtube_url;
+		var myregexp = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/i;
+		var videoID = url.match(myregexp)[1];
+		%>
+		<div class="player" style="position:relative;padding-top:56.25%;">
+			<iframe src="https://www.youtube.com/embed/<%= videoID %>" frameborder="0" allowfullscreen style="position:absolute;left:0;top:0;height:100%;width:100%;"></iframe>
 		</div>
 	</div>
 </script>
