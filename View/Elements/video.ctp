@@ -20,7 +20,7 @@
 </script>
 
 <script type="text/template" id="VideoOutput">
-	<div class="hero main future_students block" data-block_type="video">
+	<div class="video container block" data-block_type="video">
 		<textarea style="display: none;" name="model" ><%= model_json %></textarea>
 		<%
 		var url = youtube_url;
