@@ -51,7 +51,9 @@
 <script type="text/template" id="ParagraphOutput">
 	<div class="paragraph container block" data-block_type="paragraph">
 		<textarea style="display: none;" name="model" ><%= model_json %></textarea>
+        <% if(header.length > 0) { %>
 		<h1><%= header %></h1>
+        <% } %>
 		<p class="intro"><%= paragraph %></p>
 
 		<% if(cta_1_link != ''){ %>
@@ -63,4 +65,3 @@
 		<% } %>
 	</div>
 </script>
-
