@@ -59,7 +59,7 @@
 <script type="text/template" id="OutputGridImages">
 	<div class="grid_images block program" data-block_type="grid_images">
 		<textarea style="display: none;" name="model" ><%= model_json %></textarea>
-        <% if(section_heading !== '') { %>
+        <% if(section_heading.length > 0) { %>
 		<h3><%= section_heading %></h3>
         <% } %>
 		<div class="grid_images_region row"></div>
