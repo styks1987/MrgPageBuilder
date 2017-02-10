@@ -869,8 +869,13 @@ B.Output.Model.GridImage 	= B.Output.Model.extend({});
 			'paste .grid .editable' : 'handle_paste',
 		},
 		template : _.template($('#GridImages').html()),
-		render : function () {
-            var heading = this.collection.models < 0 ? '' : this.collection.models[0].get('section_heading');
+        render : function () {
+            var heading = '';
+
+            if(this.collection && this.collection.models.length > 0) {
+                heading = this.collection.models[0].get('section_heading');
+            }
+
 			this.$el.html(this.template({section_heading: heading}));
 			this.add_all();
 			this.delegateEvents();
