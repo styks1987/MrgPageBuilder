@@ -13,7 +13,8 @@
 			<option value="slides">Slider</option>
 			<option value="grid_images">Image Grid</option>
 			<option value="stats">Statistics</option>
-			<option value="columns">Three Column Content</option>
+            <option value="columns">Three Column Content</option>
+            <option value="icon_columns">Icon Columns</option>
 			<option value="home_rotator">Featured Image Rotator</option>
             <option value="video">Video</option>
             <option value="news">News</option>
@@ -35,6 +36,7 @@
 <?php echo $this->element('MrgPageBuilder.quick_links'); ?>
 <?php echo $this->element('MrgPageBuilder.stats'); ?>
 <?php echo $this->element('MrgPageBuilder.columns'); ?>
+<?php echo $this->element('MrgPageBuilder.icon_columns'); ?>
 <?php echo $this->element('MrgPageBuilder.home_rotator'); ?>
 <?php echo $this->element('MrgPageBuilder.video'); ?>
 <?php echo $this->element('MrgPageBuilder.news'); ?>

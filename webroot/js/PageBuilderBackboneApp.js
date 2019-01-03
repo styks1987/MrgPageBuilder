@@ -199,6 +199,21 @@ $(document).ready(function() {
                     }
                     columnsView.render();
                     break;
+                case 'icon_columns':
+                    if (typeof iconColumnsView == 'undefined') {
+                        iconColumnsCollection = new B.Editor.Collection.IconColumns();
+                        iconColumnsView = new B.Editor.View.IconColumns({
+                            collection: iconColumnsCollection,
+                            el: '#input_region'
+                        });
+                    } else {
+                        iconColumnsView.setElement('#input_region');
+                    }
+                    if (typeof data != 'undefined') {
+                        iconColumnsCollection.reset(data);
+                    }
+                    iconColumnsView.render();
+                    break;
                 case 'grid_images':
                     if (typeof gridImagesView == 'undefined') {
                         gridImagesCollection = new B.Editor.Collection.GridImages();
@@ -999,6 +1014,132 @@ $(document).ready(function() {
         }
     });
     // END COLUMNS
+
+    // BEGIN ICON COLUMNS
+    B.Editor.Collection.IconColumns = B.Editor.Collection.extend({});
+    B.Editor.Model.SingleIconColumn = B.Editor.Model.extend({
+        defaults: function() {
+            return {
+                background_image: '',
+                section_link: '',
+                img_alt: '',
+                header: '',
+                paragraph: ''
+            };
+        }
+    });
+
+    B.Output.Collection.IconColumns = B.Output.Collection.extend({});
+    B.Output.Model.SingleIconColumn = B.Output.Model.extend({});
+
+    B.Editor.View.IconColumns = B.Editor.View.extend({
+        events: {
+            'click a.add_icon_column': 'add_column',
+            'click a.insert_icon_column': 'render_column_output',
+            'paste .icon_column .editable': 'handle_paste'
+        },
+        template: _.template($('#IconColumns').html()),
+        render: function() {
+            this.$el.html(this.template({}));
+            this.add_all();
+            this.delegateEvents();
+        },
+        add_one: function(image) {
+            var quickSingleIconColumnModel = new B.Editor.Model.SingleIconColumn();
+            image.set(_.extend(quickSingleIconColumnModel.defaults(), image.attributes));
+            quickSingleIconColumnModel.destroy();
+
+            singleIconColumnView = new B.Editor.View.SingleIconColumn({model: image});
+            this.$el.find('#icon_columns_region').append(singleIconColumnView.render());
+            featuredImageView = new B.Editor.View.FeaturedImageView({
+                model: singleIconColumnView.model,
+                el: singleIconColumnView.$el.find('.icon_column_image_region')
+            });
+            featuredImageView.render();
+        },
+        add_all: function() {
+            this.collection.forEach(this.add_one, this);
+        },
+        add_column: function() {
+            if (this.collection.length != 3) {
+                defaults = {
+                    background_image: '',
+                    section_link: '',
+                    img_alt: '',
+                    header: '',
+                    paragraph: ''
+                };
+                singleIconIconColumnView = new B.Editor.Model.SingleIconColumn(defaults);
+                this.collection.add(singleIconIconColumnView);
+                this.add_one(singleIconIconColumnView);
+            } else {
+                alert(
+                    'You can add up to 3 columns. If you want more, just create another section.'
+                );
+            }
+        },
+        render_column_output: function() {
+            if (this.test_json_encode_decode(iconColumnsView.collection.toJSON())) {
+                iconColumnsCollectionOutput = new B.Output.Collection.IconColumns();
+                iconColumnsCollectionOutput.reset(iconColumnsView.collection.toJSON());
+                iconColumnsViewOutput = new B.Output.View.IconColumns({
+                    collection: iconColumnsCollectionOutput
+                });
+                this.render_to_preview(iconColumnsViewOutput.render().html());
+            }
+        }
+    });
+    B.Editor.View.SingleIconColumn = B.Editor.View.IconColumns.extend({
+        events: {
+            'keyup .icon_column_form input.editable': 'update_model',
+            'keyup .icon_column_form textarea.editable': 'update_model',
+            'change .icon_column_form select.editable': 'update_model',
+            'click a.delete_icon_column': 'delete_column'
+        },
+        template: _.template($('#SingleIconColumn').html()),
+        render: function() {
+            this.$el.html(this.template(this.model.attributes));
+
+            return this.$el;
+        },
+        delete_column: function() {
+            this.model.destroy();
+            this.remove();
+        }
+    });
+
+    B.Output.View.IconColumns = B.Output.View.extend({
+        initialize: function() {},
+        template: _.template($('#OutputIconColumns').html()),
+        render: function() {
+            this.$el.html(this.template({model_json: JSON.stringify(this.collection.toJSON())}));
+            this.add_all();
+            return this.$el;
+        },
+        add_one: function(column, index) {
+            column_widths = 12 / this.collection.length;
+
+            singleIconColumnViewOutput = new B.Output.View.SingleIconColumn({
+                model: column,
+                attributes: {
+                    style: 'background-image: url(' + column.get('background_image') + ')'
+                },
+                className: 'single_icon_column col-sm-' + column_widths
+            });
+            this.$el.find('.icon_columns_region').append(singleIconColumnViewOutput.render());
+        },
+        add_all: function() {
+            this.collection.forEach(this.add_one, this);
+        }
+    });
+
+    B.Output.View.SingleIconColumn = B.Output.View.IconColumns.extend({
+        template: _.template($('#OutputSingleIconColumn').html()),
+        render: function() {
+            return this.$el.html(this.template(this.model.attributes));
+        }
+    });
+    // END ICON COLUMNS
 
     // BEGIN STATISTICS
     // defaults: {header:'Headline', paragraph:'An example paragraph', cta_1_text:'',cta_1_link:'',cta_2_text:'',cta_2_link:''}
