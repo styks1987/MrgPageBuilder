@@ -214,6 +214,21 @@ $(document).ready(function() {
                     }
                     gridImagesView.render();
                     break;
+                case 'news':
+                    if (typeof newsView == 'undefined') {
+                        newsModel = new B.Editor.Model.News();
+                        newsView = new B.Editor.View.News({
+                            model: newsModel,
+                            el: '#input_region'
+                        });
+                    } else {
+                        newsView.setElement('#input_region');
+                    }
+                    if (typeof data != 'undefined') {
+                        newsModel.set(data);
+                    }
+                    newsView.render();
+                    break;
             }
         },
         close_view: function() {
@@ -435,6 +450,39 @@ $(document).ready(function() {
             }
         }
     });
+
+    // BEGIN NEWS
+
+    B.Editor.Model.News = B.Editor.Model.extend({});
+    B.Editor.View.News = B.Editor.View.extend({
+        events: {
+            'click a.insert_news': 'render_news_output'
+        },
+        template: _.template($('#News').html()),
+        render: function() {
+            this.$el.html(this.template(this.model.attributes));
+        },
+        render_news_output: function() {
+            if (this.save_view_model(newsModel)) {
+                newsModelOutput = new B.Output.Model.News();
+                newsModelOutput.set(newsModel.toJSON());
+                newsModelViewOutput = new B.Output.View.News({
+                    model: newsModelOutput
+                });
+                this.render_to_preview(newsModelViewOutput.render().html());
+            }
+        }
+    });
+    B.Output.Model.News = B.Output.Model.extend();
+    B.Output.View.News = B.Output.View.extend({
+        initialize: function() {},
+        template: _.template($('#NewsOutput').html()),
+        render: function() {
+            return this.$el.html(this.template(this.model.attributes));
+        }
+    });
+
+    // END NEWS
 
     // BEGIN Image and PARAGRAPH
     B.Editor.Model.ParagraphImage = B.Editor.Model.extend({

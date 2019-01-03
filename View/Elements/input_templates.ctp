@@ -15,7 +15,8 @@
 			<option value="stats">Statistics</option>
 			<option value="columns">Three Column Content</option>
 			<option value="home_rotator">Featured Image Rotator</option>
-			<option value="video">Video</option>
+            <option value="video">Video</option>
+            <option value="news">News</option>
 		</select>
 		<a href="javascript:void(0)" class="glyphicon glyphicon-remove close"></a>
 	</div>
@@ -36,3 +37,4 @@
 <?php echo $this->element('MrgPageBuilder.columns'); ?>
 <?php echo $this->element('MrgPageBuilder.home_rotator'); ?>
 <?php echo $this->element('MrgPageBuilder.video'); ?>
+<?php echo $this->element('MrgPageBuilder.news'); ?>
