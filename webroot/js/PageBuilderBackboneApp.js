@@ -468,7 +468,11 @@ $(document).ready(function() {
 
     // BEGIN NEWS
 
-    B.Editor.Model.News = B.Editor.Model.extend({});
+    B.Editor.Model.News = B.Editor.Model.extend({
+        defaults: {
+            header: 'Headline'
+        }
+    });
     B.Editor.View.News = B.Editor.View.extend({
         events: {
             'click a.insert_news': 'render_news_output'

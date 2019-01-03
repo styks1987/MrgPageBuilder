@@ -1,6 +1,10 @@
 <script type="text/template" id="News">
 	<div class="input_wrapper stats">
 		<div class="row"><div class="col-sm-12"><h2>News</h2></div></div>
+        <div class="row">
+            <div>Example Output</div>
+            <img style="width: 100%" src="/mrg_page_builder/img/news.png" alt="preview icon clolums" />
+        </div>
 		<div class="row">
 			<div class="col-sm-12">This block will output from your news feed</div>
 		</div>
@@ -14,6 +18,7 @@
 
 <script type="text/template" id="NewsOutput">
     <div class="news block" data-block_type="news">
+        <textarea style="display: none;" name="model" ><%= model_json %></textarea>
         <div class="container">
             <div class="carousel">
                 <ul class="news-contents-container">
