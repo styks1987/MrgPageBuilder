@@ -244,6 +244,21 @@ $(document).ready(function() {
                     }
                     newsView.render();
                     break;
+                case 'large_image_footer_slider':
+                    if (typeof largeImageFooterSliderView == 'undefined') {
+                        largeImageFooterSliderModel = new B.Editor.Model.LargeImageFooterSlider();
+                        largeImageFooterSliderView = new B.Editor.View.LargeImageFooterSlider({
+                            model: largeImageFooterSliderModel,
+                            el: '#input_region'
+                        });
+                    } else {
+                        largeImageFooterSliderView.setElement('#input_region');
+                    }
+                    if (typeof data != 'undefined') {
+                        largeImageFooterSliderModel.set(data);
+                    }
+                    largeImageFooterSliderView.render();
+                    break;
             }
         },
         close_view: function() {
@@ -502,6 +517,215 @@ $(document).ready(function() {
     });
 
     // END NEWS
+
+    // BEGIN LARGE IMAGE FOOTER SLIDER
+
+    B.Editor.Collection.LargeImageFooterSlider = B.Editor.Collection.extend({});
+    B.Editor.Model.LargeImageSection = B.Editor.Model.extend({
+        defaults: function() {
+            return {
+                background_image: '',
+                section_link: '',
+                img_alt: '',
+                header: '',
+                paragraph: '',
+                section_heading: '',
+                section_subheading: '',
+                section_cta: ''
+            };
+        }
+    });
+
+    B.Output.Collection.LargeImageFooterSlider = B.Output.Collection.extend({});
+    B.Output.Model.LargeImageSection = B.Output.Model.extend({});
+
+    B.Editor.View.LargeImageFooterSlider = B.Editor.View.extend({
+        events: {
+            'click a.add_image': 'add_image',
+            'click a.insert_image': 'render_output',
+            'keyup input.section_heading': 'save_section_heading',
+            'keyup input.section_subheading': 'save_section_subheading',
+            'keyup input.section_link': 'save_section_link',
+            'keyup input.section_cta': 'save_section_cta',
+            'paste .large_image_footer_slider .editable': 'handle_paste'
+        },
+        template: _.template($('#LargeImageFooterSlider').html()),
+        render: function() {
+            this.$el.html(
+                this.template({
+                    section_heading: '',
+                    section_subheading: '',
+                    section_link: '',
+                    section_cta: ''
+                })
+            );
+            this.add_all();
+            this.delegateEvents();
+        },
+        add_one: function(image) {
+            var quickHomeImageModel = new B.Editor.Model.LargeImageSection();
+            image.set(_.extend(quickLargeImageSectionModel.defaults(), image.attributes));
+            quickLargeImageSectionModel.destroy();
+
+            largeImageSectionView = new B.Editor.View.LargeImageSection({model: image});
+            this.$el.find('#images_region').append(largeImageSectionView.render());
+            featuredImageView = new B.Editor.View.FeaturedImageView({
+                model: largeImageSectionView.model,
+                el: largeImageSectionView.$el.find('.image_region')
+            });
+            featuredImageView.render();
+        },
+        add_all: function() {
+            this.collection.forEach(this.add_one, this);
+        },
+        add_image: function() {
+            defaults = {
+                background_image: '',
+                section_link: '',
+                img_alt: 'blank',
+                section_heading: '',
+                section_subheading: '',
+                section_link: '',
+                section_cta: ''
+            };
+            largeImageSectionModel = new B.Editor.Model.LargeImageSection(defaults);
+            this.collection.add(largeImageSectionModel);
+            this.add_one(largeImageSectionModel);
+        },
+        // to keep from having to make 2 more views
+        // Just save this to every model
+        save_section_heading: function(e) {
+            this.section_heading = $(e.currentTarget).val();
+            this.collection.forEach(this.set_model_section_heading, this);
+        },
+        set_model_section_heading: function(model) {
+            model.set('section_heading', this.section_heading);
+        },
+        save_section_subheading: function(e) {
+            this.section_subheading = $(e.currentTarget).val();
+            this.collection.forEach(this.set_model_section_subheading, this);
+        },
+        set_model_section_subheading: function(model) {
+            model.set('section_subheading', this.section_subheading);
+        },
+        save_section_link: function(e) {
+            this.section_link = $(e.currentTarget).val();
+            this.collection.forEach(this.set_model_section_link, this);
+        },
+        set_model_section_link: function(model) {
+            model.set('section_link', this.section_link);
+        },
+        save_section_cta: function(e) {
+            this.section_cta = $(e.currentTarget).val();
+            this.collection.forEach(this.set_model_section_cta, this);
+        },
+        set_model_section_cta: function(model) {
+            model.set('section_cta', this.section_cta);
+        },
+        render_output: function() {
+            if (this.test_json_encode_decode(largeImageSectionView.collection.toJSON())) {
+                largeImageFooterSliderCollectionOutput = new B.Output.Collection.LargeImageFooterSlider();
+                largeImageFooterSliderCollectionOutput.reset(homeRotatorView.collection.toJSON());
+                largeImageFooterSliderViewOutput = new B.Output.View.LargeImageFooterSlider({
+                    collection: largeImageFooterSliderCollectionOutput
+                });
+                this.render_to_preview(largeImageFooterSliderViewOutput.render().html());
+            }
+            // var hpStr = $('.home_rotator_region').attr('data-background_images');
+            // if (hpStr != undefined) {
+            //     var hpImages = JSON.parse(hpStr);
+            //     $('.bg.rotate-bg').css(
+            //         'backgroundImage',
+            //         'url(' + hpImages[Math.floor(Math.random() * hpImages.length)] + ')'
+            //     );
+            // } else {
+            //     console.log('set');
+            //     jQuery('.bg.rotate-bg').css('backgroundImage', 'none');
+            //     $('.home.main.hero .cont h1').css('color', '#144834');
+            //     $('.home.main.hero .cont p').css('color', '#144834');
+            // }
+        }
+    });
+    B.Editor.View.LargeImageSection = B.Editor.View.LargeImageFooterSlider.extend({
+        events: {
+            'keyup .image_form input.editable': 'update_model',
+            'keyup .image_form textarea.editable': 'update_model',
+            'change .image_form select.editable': 'update_model',
+            'click a.delete_image': 'delete_image'
+        },
+        template: _.template($('#LargeImageFooterSlider').html()),
+        render: function() {
+            this.$el.html(this.template(this.model.attributes));
+
+            return this.$el;
+        },
+        delete_image: function() {
+            this.model.destroy();
+            this.remove();
+        }
+    });
+
+    B.Output.View.LargeImageFooterSlider = B.Output.View.extend({
+        initialize: function() {},
+        template: _.template($('#LargeImageFooterSliderOutput').html()),
+        render: function() {
+            this.section_heading = this.collection.at(0).get('section_heading');
+            this.section_subheading = this.collection.at(0).get('section_subheading');
+            this.section_link = this.collection.at(0).get('section_link');
+            this.section_cta = this.collection.at(0).get('section_cta');
+            this.$el.html(
+                this.template({
+                    section_heading: this.section_heading,
+                    section_subheading: this.section_subheading,
+                    section_link: this.section_link,
+                    section_cta: this.section_cta,
+                    images: this.collection,
+                    model_json: JSON.stringify(this.collection.toJSON())
+                })
+            );
+            return this.$el;
+        }
+    });
+
+    // B.Editor.Model.LargeImageFooterSlider = B.Editor.Model.extend({
+    //     defaults: {
+    //         section_title: 'Explore a new possible.',
+    //         section_subtitle:
+    //             'The Demorest campus is just minutes from state parks, lakes, waterfall and other natural adventures. Or join us in Athens and be in the center of an urban setting.',
+    //         cta_text: 'Explore the Area.',
+    //         cta_link: '/explore',
+    //         background_image: ''
+    //     }
+    // });
+    // B.Editor.View.LargeImageFooterSlider = B.Editor.View.extend({
+    //     events: {
+    //         'click a.insert_large_image_footer_slider': 'render_output'
+    //     },
+    //     template: _.template($('#LargeImageFooterSlider').html()),
+    //     render: function() {
+    //         this.$el.html(this.template(this.model.attributes));
+    //     },
+    //     render_output: function() {
+    //         if (this.save_view_model(largeImageFooterSliderModel)) {
+    //             largeImageFooterSliderOutput = new B.Output.Model.LargeImageFooterSlider();
+    //             largeImageFooterSliderOutput.set(largeImageFooterSliderModel.toJSON());
+    //             largeImageFooterSliderViewOutput = new B.Output.View.LargeImageFooterSlider({
+    //                 model: largeImageFooterSliderOutput
+    //             });
+    //             this.render_to_preview(largeImageFooterSliderViewOutput.render().html());
+    //         }
+    //     }
+    // });
+    // B.Output.Model.LargeImageFooterSlider = B.Output.Model.extend();
+    // B.Output.View.LargeImageFooterSlider = B.Output.View.extend({
+    //     initialize: function() {},
+    //     template: _.template($('#LargeImageFooterSliderOutput').html()),
+    //     render: function() {
+    //         return this.$el.html(this.template(this.model.attributes));
+    //     }
+    // });
+
+    // END LARGE IMAGE FOOTER SLIDER
 
     // BEGIN Image and PARAGRAPH
     B.Editor.Model.ParagraphImage = B.Editor.Model.extend({

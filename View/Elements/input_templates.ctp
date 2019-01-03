@@ -15,7 +15,8 @@
 			<option value="stats">Statistics</option>
             <option value="columns">Three Column Content</option>
             <option value="icon_columns">Icon Columns</option>
-			<option value="home_rotator">Featured Image Rotator</option>
+            <option value="home_rotator">Featured Image Rotator</option>
+            <option value="large_image_footer_slider">Hero Image w/ Footer Slider</option>
             <option value="video">Video</option>
             <option value="news">News</option>
 		</select>
@@ -38,5 +39,6 @@
 <?php echo $this->element('MrgPageBuilder.columns'); ?>
 <?php echo $this->element('MrgPageBuilder.icon_columns'); ?>
 <?php echo $this->element('MrgPageBuilder.home_rotator'); ?>
+<?php echo $this->element('MrgPageBuilder.large_image_footer_slider'); ?>
 <?php echo $this->element('MrgPageBuilder.video'); ?>
 <?php echo $this->element('MrgPageBuilder.news'); ?>
