@@ -1,20 +1,58 @@
 <script type="text/template" id="LargeImageFooterSlider">
 	<div class="input_wrapper stats">
-		<div class="row"><div class="col-sm-12"><h2>Hero Image w/ Footer Slider</h2></div></div>
+		<div class="row">
+            <div class="col-sm-6"><h2>Hero Image w/ Footer Slider</h2></div>
+
+        </div>
         <div class="row">
             <div>Example Output</div>
             <img style="width: 100%" src="/mrg_page_builder/img/large_image_footer_slider.png" alt="preview icon clolums" />
         </div>
-		<div class="row">
-			<div class="col-sm-12">This block will output from your LargeImageFooterSlider feed</div>
-		</div>
+        <div class="row">
+            <div class="col-sm-4"><h4>Section Title</h4></div>
+            <div class="col-sm-8">
+                <input class="section_heading form-control" name="section_heading" value="<%= section_heading %>" />
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-4"><h4>Section Subtitle</h4></div>
+            <div class="col-sm-8">
+                <input class="section_subheading form-control" name="section_subheading" value="<%= section_subheading %>" />
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-4"><h4>Link</h4></div>
+            <div class="col-sm-8">
+                <input class="section_link form-control" name="section_link" value="<%= section_link %>" />
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-4"><h4>Call to Action</h4></div>
+            <div class="col-sm-8">
+                <input class="section_cta form-control" name="section_cta" value="<%= section_cta %>" />
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-6"><h2><a class="btn btn-primary add_image" href="javascript:void(0)">Add Image to Slider</a></h2></div>
+        </div>
+        <div class="row">
+            <div class="col-sm-6">Images should be at least 640x427</div>
+        </div>
+        <div id="images_region"></div>
 		<div class="row">
 			<div class="col-sm-6"><a href="javascript:void(0)" class="btn btn-primary insert_large_image_footer_slider">Insert Into Page</a></div>
 		</div>
 	</div>
 </script>
 
-
+<script type="text/template" id="FooterSliderImage">
+    <hr />
+    <div class="image_form">
+        <div clas="row">
+            <div class="image_region"></div>
+        </div>
+    </div>
+</script>
 
 <script type="text/template" id="LargeImageFooterSliderOutput">
     <div class="large_image_footer_slider block" data-block_type="large_image_footer_slider">
@@ -23,29 +61,18 @@
             <div class="bg"></div>
             <div class="cont">
                 <div class="container text-center">
-                    <h2>Explore a new possible.</h2>
-                    <p class="marker">The Demorest campus is just minutes from state parks, lakes, waterfall and other natural adventures. Or join us in Athens and be in the center of an urban setting.</p>
-                    <a href="/about-the-areas" class="btn btn-primary brown">Explore the Area.</a>
+                    <h2><%= section_heading %></h2>
+                    <p class="marker"><%= section_subheading %></p>
+                    <a href="<%= section_link %>" class="btn btn-primary brown"><%= section_cta %></a>
                 </div>
             </div>
         </div>
         <div class="gallery">
             <div class="carousel">
                 <ul>
-                    <li><img src="/theme/Piedmont/img/slide-1.jpg" alt="Students walking past a snowy tree on campus." /></li>
-                    <li><img src="/theme/Piedmont/img/slide-2.jpg" alt="Trees around a pond on campus." /></li>
-                    <li><img src="/theme/Piedmont/img/slide-3.jpg" alt="Students white-water rafting." /></li>
-                    <li><img src="/theme/Piedmont/img/slide-4.jpg" alt="Students sitting on rocks by a river." /></li>
-                    <li><img src="/theme/Piedmont/img/slide-5.jpg" alt="Autumn leaves on a mountain side." /></li>
-                    <li><img src="/theme/Piedmont/img/slide-6.jpg" alt="Students chatting around a camp fire." /></li>
-                    <li><img src="/theme/Piedmont/img/slide-7.jpg" alt="Pink flower." /></li>
-                    <li><img src="/theme/Piedmont/img/slide-8.jpg" alt="Water flowing over rocks." /></li>
-                    <li><img src="/theme/Piedmont/img/slide-9.jpg" alt="A group of students on a trip." /></li>
-                    <li><img src="/theme/Piedmont/img/slide-10.jpg" alt="Leaves changing colors in the fall." /></li>
-                    <li><img src="/theme/Piedmont/img/slide-11.jpg" alt="A waterfall." /></li>
-                    <li><img src="/theme/Piedmont/img/slide-12.jpg" alt="Students walking with a professor." /></li>
-                    <li><img src="/theme/Piedmont/img/slide-13.jpg" alt="A picture of downtown Demorest." /></li>
-                    <li><img src="/theme/Piedmont/img/slide-14.jpg" alt="Students chatting with a professor outside a restaurant." /></li>
+                    <% _.each(images, function (image) { console.log(image) %>
+                    <li><img src="<%= image.background_image %>" alt="Students walking past a snowy tree on campus." /></li>
+                    <% }) %>
                 </ul>
             </div>
             <div class="carousel_ctrl">
@@ -55,3 +82,4 @@
         </div>
     </div>
 </script>
+

@@ -246,16 +246,20 @@ $(document).ready(function() {
                     break;
                 case 'large_image_footer_slider':
                     if (typeof largeImageFooterSliderView == 'undefined') {
-                        largeImageFooterSliderModel = new B.Editor.Model.LargeImageFooterSlider();
+                        largeImageFooterSliderCollection = new B.Editor.Collection.LargeImageFooterSlider();
+                        largeImageSectionModel = new B.Editor.Model.LargeImageSection();
                         largeImageFooterSliderView = new B.Editor.View.LargeImageFooterSlider({
-                            model: largeImageFooterSliderModel,
+                            model: largeImageSectionModel,
+                            collection: largeImageFooterSliderCollection,
                             el: '#input_region'
                         });
                     } else {
                         largeImageFooterSliderView.setElement('#input_region');
                     }
                     if (typeof data != 'undefined') {
-                        largeImageFooterSliderModel.set(data);
+                        console.log(data);
+                        largeImageFooterSliderCollection.set(data);
+                        largeImageSectionModel.set(data[0]);
                     }
                     largeImageFooterSliderView.render();
                     break;
@@ -542,7 +546,7 @@ $(document).ready(function() {
     B.Editor.View.LargeImageFooterSlider = B.Editor.View.extend({
         events: {
             'click a.add_image': 'add_image',
-            'click a.insert_image': 'render_output',
+            'click a.insert_large_image_footer_slider': 'render_output',
             'keyup input.section_heading': 'save_section_heading',
             'keyup input.section_subheading': 'save_section_subheading',
             'keyup input.section_link': 'save_section_link',
@@ -551,19 +555,12 @@ $(document).ready(function() {
         },
         template: _.template($('#LargeImageFooterSlider').html()),
         render: function() {
-            this.$el.html(
-                this.template({
-                    section_heading: '',
-                    section_subheading: '',
-                    section_link: '',
-                    section_cta: ''
-                })
-            );
+            this.$el.html(this.template(this.model.attributes));
             this.add_all();
             this.delegateEvents();
         },
         add_one: function(image) {
-            var quickHomeImageModel = new B.Editor.Model.LargeImageSection();
+            var quickLargeImageSectionModel = new B.Editor.Model.LargeImageSection();
             image.set(_.extend(quickLargeImageSectionModel.defaults(), image.attributes));
             quickLargeImageSectionModel.destroy();
 
@@ -623,9 +620,11 @@ $(document).ready(function() {
             model.set('section_cta', this.section_cta);
         },
         render_output: function() {
-            if (this.test_json_encode_decode(largeImageSectionView.collection.toJSON())) {
+            if (this.test_json_encode_decode(largeImageFooterSliderView.collection.toJSON())) {
                 largeImageFooterSliderCollectionOutput = new B.Output.Collection.LargeImageFooterSlider();
-                largeImageFooterSliderCollectionOutput.reset(homeRotatorView.collection.toJSON());
+                largeImageFooterSliderCollectionOutput.reset(
+                    largeImageFooterSliderView.collection.toJSON()
+                );
                 largeImageFooterSliderViewOutput = new B.Output.View.LargeImageFooterSlider({
                     collection: largeImageFooterSliderCollectionOutput
                 });
@@ -653,7 +652,7 @@ $(document).ready(function() {
             'change .image_form select.editable': 'update_model',
             'click a.delete_image': 'delete_image'
         },
-        template: _.template($('#LargeImageFooterSlider').html()),
+        template: _.template($('#FooterSliderImage').html()),
         render: function() {
             this.$el.html(this.template(this.model.attributes));
 
@@ -679,51 +678,13 @@ $(document).ready(function() {
                     section_subheading: this.section_subheading,
                     section_link: this.section_link,
                     section_cta: this.section_cta,
-                    images: this.collection,
+                    images: this.collection.toJSON(),
                     model_json: JSON.stringify(this.collection.toJSON())
                 })
             );
             return this.$el;
         }
     });
-
-    // B.Editor.Model.LargeImageFooterSlider = B.Editor.Model.extend({
-    //     defaults: {
-    //         section_title: 'Explore a new possible.',
-    //         section_subtitle:
-    //             'The Demorest campus is just minutes from state parks, lakes, waterfall and other natural adventures. Or join us in Athens and be in the center of an urban setting.',
-    //         cta_text: 'Explore the Area.',
-    //         cta_link: '/explore',
-    //         background_image: ''
-    //     }
-    // });
-    // B.Editor.View.LargeImageFooterSlider = B.Editor.View.extend({
-    //     events: {
-    //         'click a.insert_large_image_footer_slider': 'render_output'
-    //     },
-    //     template: _.template($('#LargeImageFooterSlider').html()),
-    //     render: function() {
-    //         this.$el.html(this.template(this.model.attributes));
-    //     },
-    //     render_output: function() {
-    //         if (this.save_view_model(largeImageFooterSliderModel)) {
-    //             largeImageFooterSliderOutput = new B.Output.Model.LargeImageFooterSlider();
-    //             largeImageFooterSliderOutput.set(largeImageFooterSliderModel.toJSON());
-    //             largeImageFooterSliderViewOutput = new B.Output.View.LargeImageFooterSlider({
-    //                 model: largeImageFooterSliderOutput
-    //             });
-    //             this.render_to_preview(largeImageFooterSliderViewOutput.render().html());
-    //         }
-    //     }
-    // });
-    // B.Output.Model.LargeImageFooterSlider = B.Output.Model.extend();
-    // B.Output.View.LargeImageFooterSlider = B.Output.View.extend({
-    //     initialize: function() {},
-    //     template: _.template($('#LargeImageFooterSliderOutput').html()),
-    //     render: function() {
-    //         return this.$el.html(this.template(this.model.attributes));
-    //     }
-    // });
 
     // END LARGE IMAGE FOOTER SLIDER
 
