@@ -109,6 +109,21 @@ $(document).ready(function() {
                     }
                     featuredView.render();
                     break;
+                case 'full_width_section':
+                    if (typeof fullWidthSectionView == 'undefined') {
+                        fullWidthSectionModel = new B.Editor.Model.FullWidthSection();
+                        fullWidthSectionView = new B.Editor.View.FullWidthSection({
+                            model: fullWidthSectionModel,
+                            el: '#input_region'
+                        });
+                    } else {
+                        fullWidthSectionView.setElement('#input_region');
+                    }
+                    if (typeof data != 'undefined') {
+                        fullWidthSectionModel.set(data);
+                    }
+                    fullWidthSectionView.render();
+                    break;
                 case 'video':
                     if (typeof videoView == 'undefined') {
                         videoModel = new B.Editor.Model.Video();
@@ -632,6 +647,89 @@ $(document).ready(function() {
         }
     });
     // END FEATURED
+
+    // BEGIN FULL WIDTH SECTION
+    B.Editor.Model.FullWidthSection = B.Editor.Model.extend({
+        defaults: {
+            header: 'Headline',
+            subheader: 'A specific headline',
+            cta_text: 'CTA Text',
+            cta_link: 'CTA link',
+            background_image: ''
+        }
+    });
+    B.Output.Model.FullWidthSection = B.Output.Model.extend();
+
+    B.Editor.View.FullWidthSection = B.Editor.View.extend({
+        events: {
+            'click a.insert_full_width_section': 'render_featured_output',
+            'keyup .full_width_section input.editable': 'update_model',
+            'keyup .full_width_section textarea.editable': 'update_model',
+            'change .full_width_section select.editable': 'update_model',
+            'paste .full_width_section .editable': 'handle_paste'
+        },
+        template: _.template($('#FullWidthSection').html()),
+        render: function() {
+            this.$el.html(this.template(this.model.attributes));
+            featuredImageView = new B.Editor.View.FeaturedImageView({
+                model: this.model,
+                el: '.image_region'
+            });
+            featuredImageView.render();
+        },
+        render_featured_output: function() {
+            if (this.save_view_model(fullWidthSectionModel)) {
+                fullWidthSectionModelOutput = new B.Output.Model.FullWidthSection();
+                fullWidthSectionModelOutput.set(fullWidthSectionModel.toJSON());
+                fullWidthSectionModelViewOutput = new B.Output.View.FullWidthSection({
+                    model: fullWidthSectionModelOutput
+                });
+                this.render_to_preview(fullWidthSectionModelViewOutput.render().html());
+            }
+        }
+    });
+
+    B.Editor.View.FullWidthSectionImageView = B.Editor.View.extend({
+        events: {
+            'click .delete_image': 'delete_image'
+        },
+        initialize: function() {
+            editorFeaturedImage = new B.Editor.View.Uploader({
+                allowedfileextensions: ['.jpg', '.png'],
+                data: {directory: '/uploads/featured_images'}
+            });
+            this.listenTo(editorFeaturedImage, 'finished_upload', this.finished_upload);
+        },
+        template: _.template($('#FullWidthSectionImage').html()),
+        render: function() {
+            this.model.attributes.cid = this.model.cid;
+            this.$el.html(this.template(this.model.attributes));
+            editorFeaturedImage.options.fallback_id = 'upload_button_' + this.model.cid;
+            editorFeaturedImage.options.upload_box = '#dropbox_' + this.model.cid;
+
+            editorFeaturedImage.render();
+        },
+        finished_upload: function(file, response) {
+            this.model.set(
+                'background_image',
+                '/uploads/featured_images/' + response.target_filename
+            );
+            this.render();
+        },
+        delete_image: function() {
+            this.model.set('background_image', null);
+            this.render();
+        }
+    });
+
+    B.Output.View.FullWidthSection = B.Output.View.extend({
+        initialize: function() {},
+        template: _.template($('#FullWidthSectionOutput').html()),
+        render: function() {
+            return this.$el.html(this.template(this.model.attributes));
+        }
+    });
+    // END FULL WIDTH SECTION
 
     // BEGIN LARGE IMAGE FOOTER SLIDER
 

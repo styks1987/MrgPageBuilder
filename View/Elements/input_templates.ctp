@@ -21,6 +21,7 @@
             <option value="large_image_footer_slider">Hero Image w/ Footer Slider</option>
             <option value="at_a_glance">Three Column Specialized Stats</option>
             <option value="four_grid_images">Four Image Grid w/ Intro</option>
+            <option value="full_width_section">Full Width Section</option>
 		</select>
 		<a href="javascript:void(0)" class="glyphicon glyphicon-remove close"></a>
 	</div>
@@ -46,3 +47,4 @@
 <?php echo $this->element('MrgPageBuilder.news'); ?>
 <?php echo $this->element('MrgPageBuilder.at_a_glance'); ?>
 <?php echo $this->element('MrgPageBuilder.four_grid_images'); ?>
+<?php echo $this->element('MrgPageBuilder.full_width_section'); ?>
