@@ -19,6 +19,7 @@
             <option value="large_image_footer_slider">Hero Image w/ Footer Slider</option>
             <option value="video">Video</option>
             <option value="news">News</option>
+            <option value="at_a_glance">Three Column Specialized Stats</option>
 		</select>
 		<a href="javascript:void(0)" class="glyphicon glyphicon-remove close"></a>
 	</div>
@@ -42,3 +43,4 @@
 <?php echo $this->element('MrgPageBuilder.large_image_footer_slider'); ?>
 <?php echo $this->element('MrgPageBuilder.video'); ?>
 <?php echo $this->element('MrgPageBuilder.news'); ?>
+<?php echo $this->element('MrgPageBuilder.at_a_glance'); ?>

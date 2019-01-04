@@ -257,11 +257,25 @@ $(document).ready(function() {
                         largeImageFooterSliderView.setElement('#input_region');
                     }
                     if (typeof data != 'undefined') {
-                        console.log(data);
                         largeImageFooterSliderCollection.set(data);
                         largeImageSectionModel.set(data[0]);
                     }
                     largeImageFooterSliderView.render();
+                    break;
+                case 'at_a_glance':
+                    if (typeof atAGlanceView == 'undefined') {
+                        atAGlanceModel = new B.Editor.Model.AtAGlance();
+                        atAGlanceView = new B.Editor.View.AtAGlance({
+                            model: atAGlanceModel,
+                            el: '#input_region'
+                        });
+                    } else {
+                        atAGlanceView.setElement('#input_region');
+                    }
+                    if (typeof data != 'undefined') {
+                        atAGlanceModel.set(data);
+                    }
+                    atAGlanceView.render();
                     break;
             }
         },
@@ -522,6 +536,87 @@ $(document).ready(function() {
 
     // END NEWS
 
+    // BEGIN FEATURED
+    B.Editor.Model.Featured = B.Editor.Model.extend({
+        defaults: {
+            header: 'Headline',
+            subheader: 'A specific headline',
+            cta_text: 'CTA Text',
+            cta_link: 'CTA link',
+            background_image: ''
+        }
+    });
+    B.Output.Model.Featured = B.Output.Model.extend();
+
+    B.Editor.View.Featured = B.Editor.View.extend({
+        events: {
+            'click a.insert_featured': 'render_featured_output',
+            'keyup .featured input.editable': 'update_model',
+            'keyup .featured textarea.editable': 'update_model',
+            'change .featured select.editable': 'update_model',
+            'paste .featured .editable': 'handle_paste'
+        },
+        template: _.template($('#Featured').html()),
+        render: function() {
+            this.$el.html(this.template(this.model.attributes));
+            featuredImageView = new B.Editor.View.FeaturedImageView({
+                model: this.model,
+                el: '.image_region'
+            });
+            featuredImageView.render();
+        },
+        render_featured_output: function() {
+            if (this.save_view_model(featuredModel)) {
+                featuredModelOutput = new B.Output.Model.Featured();
+                featuredModelOutput.set(featuredModel.toJSON());
+                featuredModelViewOutput = new B.Output.View.Featured({model: featuredModelOutput});
+                this.render_to_preview(featuredModelViewOutput.render().html());
+            }
+        }
+    });
+
+    B.Editor.View.FeaturedImageView = B.Editor.View.extend({
+        events: {
+            'click .delete_image': 'delete_image'
+        },
+        initialize: function() {
+            editorFeaturedImage = new B.Editor.View.Uploader({
+                allowedfileextensions: ['.jpg', '.png'],
+                data: {directory: '/uploads/featured_images'}
+            });
+            this.listenTo(editorFeaturedImage, 'finished_upload', this.finished_upload);
+        },
+        template: _.template($('#FeaturedImage').html()),
+        render: function() {
+            this.model.attributes.cid = this.model.cid;
+            this.$el.html(this.template(this.model.attributes));
+            editorFeaturedImage.options.fallback_id = 'upload_button_' + this.model.cid;
+            editorFeaturedImage.options.upload_box = '#dropbox_' + this.model.cid;
+
+            editorFeaturedImage.render();
+        },
+        finished_upload: function(file, response) {
+            this.model.set(
+                'background_image',
+                '/uploads/featured_images/' + response.target_filename
+            );
+            this.render();
+        },
+        delete_image: function() {
+            this.model.set('background_image', null);
+            this.render();
+        }
+    });
+
+    B.Output.View.Featured = B.Output.View.extend({
+        initialize: function() {},
+        template: _.template($('#FeaturedOutput').html()),
+        render: function() {
+            return this.$el.html(this.template(this.model.attributes));
+        }
+    });
+    // END FEATURED
+
     // BEGIN LARGE IMAGE FOOTER SLIDER
 
     B.Editor.Collection.LargeImageFooterSlider = B.Editor.Collection.extend({});
@@ -543,6 +638,8 @@ $(document).ready(function() {
     B.Output.Collection.LargeImageFooterSlider = B.Output.Collection.extend({});
     B.Output.Model.LargeImageSection = B.Output.Model.extend({});
 
+    B.Editor.Model.SectionBackground = B.Editor.Model.Featured.extend({});
+
     B.Editor.View.LargeImageFooterSlider = B.Editor.View.extend({
         events: {
             'click a.add_image': 'add_image',
@@ -556,6 +653,16 @@ $(document).ready(function() {
         template: _.template($('#LargeImageFooterSlider').html()),
         render: function() {
             this.$el.html(this.template(this.model.attributes));
+            sectionBackgroundModel = new B.Editor.Model.SectionBackground({
+                background_image: this.model.get('section_background')
+            });
+            sectionBackgroundModel.on({change: this.save_section_background.bind(this)});
+            // Main background
+            featuredImageView = new B.Editor.View.FeaturedImageView({
+                model: sectionBackgroundModel,
+                el: '#section_background'
+            });
+            featuredImageView.render();
             this.add_all();
             this.delegateEvents();
         },
@@ -578,6 +685,7 @@ $(document).ready(function() {
         add_image: function() {
             defaults = {
                 background_image: '',
+                section_background: '',
                 section_link: '',
                 img_alt: 'blank',
                 section_heading: '',
@@ -619,6 +727,12 @@ $(document).ready(function() {
         set_model_section_cta: function(model) {
             model.set('section_cta', this.section_cta);
         },
+        save_section_background: function(imageModel) {
+            this.collection.forEach(function(model) {
+                model.set('section_background', imageModel.get('background_image'));
+            }, this);
+            console.log(this.collection.toJSON());
+        },
         render_output: function() {
             if (this.test_json_encode_decode(largeImageFooterSliderView.collection.toJSON())) {
                 largeImageFooterSliderCollectionOutput = new B.Output.Collection.LargeImageFooterSlider();
@@ -630,19 +744,6 @@ $(document).ready(function() {
                 });
                 this.render_to_preview(largeImageFooterSliderViewOutput.render().html());
             }
-            // var hpStr = $('.home_rotator_region').attr('data-background_images');
-            // if (hpStr != undefined) {
-            //     var hpImages = JSON.parse(hpStr);
-            //     $('.bg.rotate-bg').css(
-            //         'backgroundImage',
-            //         'url(' + hpImages[Math.floor(Math.random() * hpImages.length)] + ')'
-            //     );
-            // } else {
-            //     console.log('set');
-            //     jQuery('.bg.rotate-bg').css('backgroundImage', 'none');
-            //     $('.home.main.hero .cont h1').css('color', '#144834');
-            //     $('.home.main.hero .cont p').css('color', '#144834');
-            // }
         }
     });
     B.Editor.View.LargeImageSection = B.Editor.View.LargeImageFooterSlider.extend({
@@ -669,12 +770,14 @@ $(document).ready(function() {
         template: _.template($('#LargeImageFooterSliderOutput').html()),
         render: function() {
             this.section_heading = this.collection.at(0).get('section_heading');
+            this.section_background = this.collection.at(0).get('section_background');
             this.section_subheading = this.collection.at(0).get('section_subheading');
             this.section_link = this.collection.at(0).get('section_link');
             this.section_cta = this.collection.at(0).get('section_cta');
             this.$el.html(
                 this.template({
                     section_heading: this.section_heading,
+                    section_background: this.section_background,
                     section_subheading: this.section_subheading,
                     section_link: this.section_link,
                     section_cta: this.section_cta,
@@ -819,6 +922,65 @@ $(document).ready(function() {
 
     // END TEXT and PARAGRAPH
 
+    // BEGIN AT A GLANCE
+    B.Editor.Model.AtAGlance = B.Editor.Model.extend({
+        defaults: {
+            section_heading: '',
+            col1_big_number: '',
+            col1_big_number_title: '',
+            col1_big_number_text: '',
+            col1_big_number2: '',
+            col1_big_number_title2: '',
+            col1_big_number3: '',
+            col1_big_number_title3: '',
+            col2_big_number: '',
+            col2_big_number_title: '',
+            col2_paragraph: '',
+            col2_footer: '',
+            col3_big_number: '',
+            col3_big_number_title: '',
+            col3_big_number_text: '',
+            col3_cta_text: '',
+            col3_cta_url: ''
+        }
+    });
+    B.Output.Model.AtAGlance = B.Output.Model.extend();
+
+    B.Editor.View.AtAGlance = B.Editor.View.extend({
+        events: {
+            'click a.insert_at_glance': 'render_paragraph_output',
+            'keyup .at_a_glance input.editable': 'update_model',
+            'keyup .at_a_glance textarea.editable': 'update_model',
+            'change .at_a_glance select.editable': 'update_model',
+            'paste .at_a_glance .editable': 'handle_paste'
+        },
+        template: _.template($('#AtAGlance').html()),
+        render: function() {
+            this.model.set('model_json', JSON.stringify(this.model.toJSON()));
+            this.$el.html(this.template(this.model.attributes));
+        },
+        render_paragraph_output: function() {
+            if (this.save_view_model(atAGlanceModel)) {
+                atAGlanceModelOutput = new B.Output.Model.AtAGlance();
+                atAGlanceModelOutput.set(atAGlanceModel.toJSON());
+                atAGlanceViewOutput = new B.Output.View.AtAGlance({
+                    model: atAGlanceModelOutput
+                });
+                this.render_to_preview(atAGlanceViewOutput.render().html());
+            }
+        }
+    });
+
+    B.Output.View.AtAGlance = B.Output.View.extend({
+        initialize: function() {},
+        template: _.template($('#AtAGlanceOutput').html()),
+        render: function() {
+            return this.$el.html(this.template(this.model.attributes));
+        }
+    });
+
+    // END AT A GLANCE
+
     // BEGIN VIDEO
     B.Editor.Model.Video = B.Editor.Model.extend({defaults: {youtube_url: ''}});
     B.Output.Model.Video = B.Output.Model.extend();
@@ -854,87 +1016,6 @@ $(document).ready(function() {
     });
 
     // END VIDEO
-
-    // BEGIN FEATURED
-    B.Editor.Model.Featured = B.Editor.Model.extend({
-        defaults: {
-            header: 'Headline',
-            subheader: 'A specific headline',
-            cta_text: 'CTA Text',
-            cta_link: 'CTA link',
-            background_image: ''
-        }
-    });
-    B.Output.Model.Featured = B.Output.Model.extend();
-
-    B.Editor.View.Featured = B.Editor.View.extend({
-        events: {
-            'click a.insert_featured': 'render_featured_output',
-            'keyup .featured input.editable': 'update_model',
-            'keyup .featured textarea.editable': 'update_model',
-            'change .featured select.editable': 'update_model',
-            'paste .featured .editable': 'handle_paste'
-        },
-        template: _.template($('#Featured').html()),
-        render: function() {
-            this.$el.html(this.template(this.model.attributes));
-            featuredImageView = new B.Editor.View.FeaturedImageView({
-                model: this.model,
-                el: '.image_region'
-            });
-            featuredImageView.render();
-        },
-        render_featured_output: function() {
-            if (this.save_view_model(featuredModel)) {
-                featuredModelOutput = new B.Output.Model.Featured();
-                featuredModelOutput.set(featuredModel.toJSON());
-                featuredModelViewOutput = new B.Output.View.Featured({model: featuredModelOutput});
-                this.render_to_preview(featuredModelViewOutput.render().html());
-            }
-        }
-    });
-
-    B.Editor.View.FeaturedImageView = B.Editor.View.extend({
-        events: {
-            'click .delete_image': 'delete_image'
-        },
-        initialize: function() {
-            editorFeaturedImage = new B.Editor.View.Uploader({
-                allowedfileextensions: ['.jpg', '.png'],
-                data: {directory: '/uploads/featured_images'}
-            });
-            this.listenTo(editorFeaturedImage, 'finished_upload', this.finished_upload);
-        },
-        template: _.template($('#FeaturedImage').html()),
-        render: function() {
-            this.model.attributes.cid = this.model.cid;
-            this.$el.html(this.template(this.model.attributes));
-            editorFeaturedImage.options.fallback_id = 'upload_button_' + this.model.cid;
-            editorFeaturedImage.options.upload_box = '#dropbox_' + this.model.cid;
-
-            editorFeaturedImage.render();
-        },
-        finished_upload: function(file, response) {
-            this.model.set(
-                'background_image',
-                '/uploads/featured_images/' + response.target_filename
-            );
-            this.render();
-        },
-        delete_image: function() {
-            this.model.set('background_image', null);
-            this.render();
-        }
-    });
-
-    B.Output.View.Featured = B.Output.View.extend({
-        initialize: function() {},
-        template: _.template($('#FeaturedOutput').html()),
-        render: function() {
-            return this.$el.html(this.template(this.model.attributes));
-        }
-    });
-    // END FEATURED
 
     // BEGIN QUOTE
     B.Editor.Model.Quote = B.Editor.Model.extend({defaults: {quote_name: '', quote_text: ''}});
@@ -1886,7 +1967,6 @@ $(document).ready(function() {
                     'url(' + hpImages[Math.floor(Math.random() * hpImages.length)] + ')'
                 );
             } else {
-                console.log('set');
                 jQuery('.bg.rotate-bg').css('backgroundImage', 'none');
                 $('.home.main.hero .cont h1').css('color', '#144834');
                 $('.home.main.hero .cont p').css('color', '#144834');

@@ -1,12 +1,18 @@
 <script type="text/template" id="LargeImageFooterSlider">
 	<div class="input_wrapper stats">
 		<div class="row">
-            <div class="col-sm-6"><h2>Hero Image w/ Footer Slider</h2></div>
+            <div class="col-sm-12"><h2>Hero Image w/ Footer Slider</h2></div>
 
         </div>
         <div class="row">
             <div>Example Output</div>
             <img style="width: 100%" src="/mrg_page_builder/img/large_image_footer_slider.png" alt="preview icon clolums" />
+        </div>
+        <div class="row">
+            <div class="col-sm-4"><h4>Section Background Image</h4></div>
+            <div class="col-sm-8">
+                <div id="section_background"></div>
+            </div>
         </div>
         <div class="row">
             <div class="col-sm-4"><h4>Section Title</h4></div>
@@ -58,7 +64,7 @@
     <div class="large_image_footer_slider block" data-block_type="large_image_footer_slider">
         <textarea style="display: none;" name="model" ><%= model_json %></textarea>
         <div class="hero topography">
-            <div class="bg"></div>
+            <div class="bg" style="background-image: url(<%= section_background %>)"></div>
             <div class="cont">
                 <div class="container text-center">
                     <h2><%= section_heading %></h2>
@@ -70,7 +76,7 @@
         <div class="gallery">
             <div class="carousel">
                 <ul>
-                    <% _.each(images, function (image) { console.log(image) %>
+                    <% _.each(images, function (image) { %>
                     <li><img src="<%= image.background_image %>" alt="Students walking past a snowy tree on campus." /></li>
                     <% }) %>
                 </ul>
