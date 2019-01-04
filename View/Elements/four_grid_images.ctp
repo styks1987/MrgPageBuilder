@@ -9,45 +9,32 @@
         </div>
 
 		<div class="row">
-			<div class="col-sm-12">
-				<h2>Section Title</h2>
+			<div class="col-sm-4">
+				<label>Section Title</label>
 			</div>
-		</div>
-		<div class="row">
-			<div class="col-sm-12">
+			<div class="col-sm-8">
 				<input class="section_heading form-control" name="section_heading" value="<%= section_heading %>" />
 			</div>
 		</div>
         <div class="row">
-            <div class="col-sm-12">
-                <h2>Section Paragraph</h2>
+            <div class="col-sm-4">
+                <label>Section Paragraph</label>
             </div>
-        </div>
-        <div class="row">
-            <div class="col-sm-12">
+            <div class="col-sm-8">
                 <textarea width=100% name="section_paragraph" class="section_paragraph editable form-control" ><%= section_paragraph %></textarea>
             </div>
         </div>
         <div class="row">
-            <div class="col-sm-12">
-                <h2>Section Call To Action</h2>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-sm-12">
+            <div class="col-sm-6">
+                <label>Section Call To Action</label>
                 <input class="section_cta form-control" name="section_cta" value="<%= section_cta %>" />
             </div>
-        </div>
-        <div class="row">
-            <div class="col-sm-12">
-                <h2>Section CTA Link</h2>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-sm-12">
+            <div class="col-sm-6">
+                <label>Section CTA Link</label>
                 <input class="section_cta_link form-control" name="section_cta_link" value="<%= section_cta_link %>" />
             </div>
         </div>
+        <h3 style="margin-top:20px">Grid Images</h3>
 		<div id="four_grid_image_region"></div>
         <div><h2><a class="btn btn-primary add_image" href="javascript:void(0)">Add Image</a></h2></div>
 		<div class="row">
@@ -57,30 +44,31 @@
 </script>
 
 <script type="text/template" id="FourGridImage">
-    <hr />
     <div class="four_grid_form">
         <div class="row">
-            <div class="col-sm-4"><label>Image Title</label></div>
-            <div class="col-sm-6"><input class="form-control editable" type="text" name="header" value="<%= header %>" /></div>
-            <div class="col-sm-2"><a href="javascript:void(0)" class="delete_grid glyphicon glyphicon-trash" /></div>
-        </div>
-        <div class="row">
-            <div class="col-sm-4"><label>Image Link</label></div>
-            <div class="col-sm-8">
-                <input class="form-control editable" type="text" name="section_link" value="<%= section_link %>" />
+            <div class="col-sm-5">
+                <div class="four_grid_image_region"></div>
             </div>
-        </div>
-
-        <div class="row">
-            <div class="col-sm-6">
-                <label>Image Alt</label>
-                <input class="form-control editable" type="text" name="img_alt" value="<%= img_alt %>" />
+            <div class="col-sm-7">
+            <div class="row">
+                <div class="col-sm-12">
+                    <label>Image Title <a href="javascript:void(0)" class="delete_grid glyphicon glyphicon-trash" /></label>
+                    <input class="form-control editable" type="text" name="header" value="<%= header %>" />
+                </div>
             </div>
-
+            <div class="row">
+                <div class="col-sm-6">
+                    <label>Image Link</label>
+                    <input class="form-control editable" type="text" name="section_link" value="<%= section_link %>" />
+                </div>
+                <div class="col-sm-6">
+                    <label>Image Alt</label>
+                    <input class="form-control editable" type="text" name="img_alt" value="<%= img_alt %>" />
+                </div>
+            </div>
         </div>
     </div>
 
-    <div class="four_grid_image_region"></div>
 </script>
 
 

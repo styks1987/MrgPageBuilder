@@ -158,12 +158,14 @@
                     <ul>
                         <li>
                             <div class="row">
-                                <div class="col-sm-6">
+                                <div class="col-sm-12">
                                     <h3 class="lg"><%= col1_big_number %></h3>
                                     <p class="caption lg"><%= col1_big_number_title %></p>
                                     <p><%= col1_big_number_text %></p>
                                 </div>
-                                <div class="col-sm-6">
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12">
                                     <h3><%= col1_big_number2 %></h3>
                                     <p class="caption"><%= col1_big_number_title2 %></p>
                                     <h3><%= col1_big_number3 %></h3>
