@@ -833,7 +833,7 @@ $(document).ready(function() {
             'keyup .image_form input.editable': 'update_model',
             'keyup .image_form textarea.editable': 'update_model',
             'change .image_form select.editable': 'update_model',
-            'click a.delete_image': 'delete_image'
+            'click a.delete_slider_image': 'delete_image'
         },
         template: _.template($('#FooterSliderImage').html()),
         render: function() {
