@@ -247,7 +247,9 @@ $(document).ready(function() {
                 case 'four_grid_images':
                     if (typeof fourGridImagesView == 'undefined') {
                         fourGridImagesCollection = new B.Editor.Collection.FourGridImages();
+                        fourGridImagesSectionModel = new B.Editor.Model.FourGridImages();
                         fourGridImagesView = new B.Editor.View.FourGridImages({
+                            model: fourGridImagesSectionModel,
                             collection: fourGridImagesCollection,
                             el: '#input_region'
                         });
@@ -255,8 +257,8 @@ $(document).ready(function() {
                         fourGridImagesView.setElement('#input_region');
                     }
                     if (typeof data != 'undefined') {
-                        console.log(data);
-                        fourGridImagesCollection.reset(data);
+                        fourGridImagesCollection.reset(data['collection']);
+                        fourGridImagesSectionModel.set(data['model']);
                     }
                     fourGridImagesView.render();
                     break;
@@ -288,8 +290,8 @@ $(document).ready(function() {
                         largeImageFooterSliderView.setElement('#input_region');
                     }
                     if (typeof data != 'undefined') {
-                        largeImageFooterSliderCollection.set(data);
-                        largeImageSectionModel.set(data[0]);
+                        largeImageFooterSliderCollection.reset(data['collection']);
+                        largeImageSectionModel.set(data['model']);
                     }
                     largeImageFooterSliderView.render();
                     break;
@@ -758,10 +760,7 @@ $(document).ready(function() {
         events: {
             'click a.add_image': 'add_image',
             'click a.insert_large_image_footer_slider': 'render_output',
-            'keyup input.section_heading': 'save_section_heading',
-            'keyup input.section_subheading': 'save_section_subheading',
-            'keyup input.section_link': 'save_section_link',
-            'keyup input.section_cta': 'save_section_cta',
+            'keyup input': 'update_model',
             'paste .large_image_footer_slider .editable': 'handle_paste'
         },
         template: _.template($('#LargeImageFooterSlider').html()),
@@ -811,50 +810,19 @@ $(document).ready(function() {
             this.collection.add(largeImageSectionModel);
             this.add_one(largeImageSectionModel);
         },
-        // to keep from having to make 2 more views
-        // Just save this to every model
-        save_section_heading: function(e) {
-            this.section_heading = $(e.currentTarget).val();
-            this.collection.forEach(this.set_model_section_heading, this);
-        },
-        set_model_section_heading: function(model) {
-            model.set('section_heading', this.section_heading);
-        },
-        save_section_subheading: function(e) {
-            this.section_subheading = $(e.currentTarget).val();
-            this.collection.forEach(this.set_model_section_subheading, this);
-        },
-        set_model_section_subheading: function(model) {
-            model.set('section_subheading', this.section_subheading);
-        },
-        save_section_link: function(e) {
-            this.section_link = $(e.currentTarget).val();
-            this.collection.forEach(this.set_model_section_link, this);
-        },
-        set_model_section_link: function(model) {
-            model.set('section_link', this.section_link);
-        },
-        save_section_cta: function(e) {
-            this.section_cta = $(e.currentTarget).val();
-            this.collection.forEach(this.set_model_section_cta, this);
-        },
-        set_model_section_cta: function(model) {
-            model.set('section_cta', this.section_cta);
-        },
         save_section_background: function(imageModel) {
-            this.collection.forEach(function(model) {
-                model.set('section_background', imageModel.get('background_image'));
-            }, this);
-            console.log(this.collection.toJSON());
+            this.model.set('section_background', imageModel.get('background_image'));
         },
         render_output: function() {
             if (this.test_json_encode_decode(largeImageFooterSliderView.collection.toJSON())) {
+                // Important to set the fields if no items were in the collection when the fields were edited
                 largeImageFooterSliderCollectionOutput = new B.Output.Collection.LargeImageFooterSlider();
                 largeImageFooterSliderCollectionOutput.reset(
                     largeImageFooterSliderView.collection.toJSON()
                 );
                 largeImageFooterSliderViewOutput = new B.Output.View.LargeImageFooterSlider({
-                    collection: largeImageFooterSliderCollectionOutput
+                    collection: largeImageFooterSliderCollectionOutput,
+                    model: this.model
                 });
                 this.render_to_preview(largeImageFooterSliderViewOutput.render().html());
             }
@@ -883,20 +851,18 @@ $(document).ready(function() {
         initialize: function() {},
         template: _.template($('#LargeImageFooterSliderOutput').html()),
         render: function() {
-            this.section_heading = this.collection.at(0).get('section_heading');
-            this.section_background = this.collection.at(0).get('section_background');
-            this.section_subheading = this.collection.at(0).get('section_subheading');
-            this.section_link = this.collection.at(0).get('section_link');
-            this.section_cta = this.collection.at(0).get('section_cta');
             this.$el.html(
                 this.template({
-                    section_heading: this.section_heading,
-                    section_background: this.section_background,
-                    section_subheading: this.section_subheading,
-                    section_link: this.section_link,
-                    section_cta: this.section_cta,
+                    section_heading: this.model.get('section_heading'),
+                    section_background: this.model.get('section_background'),
+                    section_subheading: this.model.get('section_subheading'),
+                    section_link: this.model.get('section_link'),
+                    section_cta: this.model.get('section_cta'),
                     images: this.collection.toJSON(),
-                    model_json: JSON.stringify(this.collection.toJSON())
+                    model_json: JSON.stringify({
+                        collection: this.collection.toJSON(),
+                        model: this.model.toJSON()
+                    })
                 })
             );
             return this.$el;
@@ -1728,15 +1694,24 @@ $(document).ready(function() {
     // BEGIN Four Grid Images
 
     B.Editor.Collection.FourGridImages = B.Editor.Collection.extend({});
+    B.Editor.Model.FourGridImages = B.Editor.Model.extend({
+        defaults: function() {
+            return {
+                section_heading: '',
+                section_paragraph: '',
+                section_cta_link: '',
+                section_cta: ''
+            };
+        }
+    });
+
     B.Editor.Model.FourGridImage = B.Editor.Model.extend({
         defaults: function() {
             return {
-                background_image: '',
                 section_link: '',
+                background_image: '',
                 img_alt: '',
-                header: '',
-                paragraph: '',
-                section_heading: ''
+                header: ''
             };
         }
     });
@@ -1748,34 +1723,13 @@ $(document).ready(function() {
         events: {
             'click a.add_image': 'add_image',
             'click a.insert_four_grid': 'render_output',
-            'keyup input.section_heading': 'save_section_heading',
-            'keyup textarea.section_paragraph': 'save_section_paragraph',
-            'keyup input.section_cta': 'save_section_cta',
-            'keyup input.section_cta_link': 'save_section_cta_link',
+            'keyup input': 'update_model',
+            'keyup textarea': 'update_model',
             'paste .four_grid .editable': 'handle_paste'
         },
         template: _.template($('#FourGridImages').html()),
         render: function() {
-            var heading = '';
-            var paragraph = '';
-            var cta = '';
-            var cta_link = '';
-
-            if (this.collection && this.collection.models.length > 0) {
-                heading = this.collection.at(0).get('section_heading');
-                paragraph = this.collection.at(0).get('section_paragraph');
-                cta = this.collection.at(0).get('section_cta');
-                cta_link = this.collection.at(0).get('section_cta_link');
-            }
-
-            this.$el.html(
-                this.template({
-                    section_heading: heading,
-                    section_paragraph: paragraph,
-                    section_cta: cta,
-                    section_cta_link: cta_link
-                })
-            );
+            this.$el.html(this.template(this.model.attributes));
             this.add_all();
             this.delegateEvents();
         },
@@ -1817,41 +1771,12 @@ $(document).ready(function() {
                 );
             }
         },
-        // to keep from having to make 2 more views
-        // Just save this to every model
-        save_section_heading: function(e) {
-            this.section_heading = $(e.currentTarget).val();
-            this.collection.forEach(this.set_model_section_heading, this);
-        },
-        set_model_section_heading: function(model) {
-            model.set('section_heading', this.section_heading);
-        },
-        save_section_paragraph: function(e) {
-            this.section_paragraph = $(e.currentTarget).val();
-            this.collection.forEach(this.set_model_section_paragraph, this);
-        },
-        set_model_section_paragraph: function(model) {
-            model.set('section_paragraph', this.section_paragraph);
-        },
-        save_section_cta: function(e) {
-            this.section_cta = $(e.currentTarget).val();
-            this.collection.forEach(this.set_model_section_cta, this);
-        },
-        set_model_section_cta: function(model) {
-            model.set('section_cta', this.section_cta);
-        },
-        save_section_cta_link: function(e) {
-            this.section_cta_link = $(e.currentTarget).val();
-            this.collection.forEach(this.set_model_section_cta_link, this);
-        },
-        set_model_section_cta_link: function(model) {
-            model.set('section_cta_link', this.section_cta_link);
-        },
         render_output: function() {
             if (this.test_json_encode_decode(fourGridImagesView.collection.toJSON())) {
                 fourGridImagesCollectionOutput = new B.Output.Collection.FourGridImages();
                 fourGridImagesCollectionOutput.reset(fourGridImagesView.collection.toJSON());
                 fourGridImagesViewOutput = new B.Output.View.FourGridImages({
+                    model: this.model,
                     collection: fourGridImagesCollectionOutput
                 });
                 this.render_to_preview(fourGridImagesViewOutput.render().html());
@@ -1887,11 +1812,14 @@ $(document).ready(function() {
             this.section_cta_link = this.collection.at(0).get('section_cta_link');
             this.$el.html(
                 this.template({
-                    section_heading: this.section_heading,
-                    section_paragraph: this.section_paragraph,
-                    section_cta: this.section_cta,
-                    section_cta_link: this.section_cta_link,
-                    model_json: JSON.stringify(this.collection.toJSON())
+                    section_heading: this.model.get('section_heading'),
+                    section_paragraph: this.model.get('section_paragraph'),
+                    section_cta: this.model.get('section_cta'),
+                    section_cta_link: this.model.get('section_cta_link'),
+                    model_json: JSON.stringify({
+                        collection: this.collection.toJSON(),
+                        model: this.model.toJSON()
+                    })
                 })
             );
             this.add_all();
