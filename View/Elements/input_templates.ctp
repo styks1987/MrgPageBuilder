@@ -14,12 +14,13 @@
 			<option value="grid_images">Image Grid</option>
 			<option value="stats">Statistics</option>
             <option value="columns">Three Column Content</option>
-            <option value="icon_columns">Icon Columns</option>
             <option value="home_rotator">Featured Image Rotator</option>
-            <option value="large_image_footer_slider">Hero Image w/ Footer Slider</option>
             <option value="video">Video</option>
             <option value="news">News</option>
+            <option value="icon_columns">Icon Columns</option>
+            <option value="large_image_footer_slider">Hero Image w/ Footer Slider</option>
             <option value="at_a_glance">Three Column Specialized Stats</option>
+            <option value="four_grid_images">Four Image Grid w/ Intro</option>
 		</select>
 		<a href="javascript:void(0)" class="glyphicon glyphicon-remove close"></a>
 	</div>
@@ -44,3 +45,4 @@
 <?php echo $this->element('MrgPageBuilder.video'); ?>
 <?php echo $this->element('MrgPageBuilder.news'); ?>
 <?php echo $this->element('MrgPageBuilder.at_a_glance'); ?>
+<?php echo $this->element('MrgPageBuilder.four_grid_images'); ?>

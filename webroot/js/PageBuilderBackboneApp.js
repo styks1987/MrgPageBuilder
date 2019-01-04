@@ -229,6 +229,22 @@ $(document).ready(function() {
                     }
                     gridImagesView.render();
                     break;
+                case 'four_grid_images':
+                    if (typeof fourGridImagesView == 'undefined') {
+                        fourGridImagesCollection = new B.Editor.Collection.FourGridImages();
+                        fourGridImagesView = new B.Editor.View.FourGridImages({
+                            collection: fourGridImagesCollection,
+                            el: '#input_region'
+                        });
+                    } else {
+                        fourGridImagesView.setElement('#input_region');
+                    }
+                    if (typeof data != 'undefined') {
+                        console.log(data);
+                        fourGridImagesCollection.reset(data);
+                    }
+                    fourGridImagesView.render();
+                    break;
                 case 'news':
                     if (typeof newsView == 'undefined') {
                         newsModel = new B.Editor.Model.News();
@@ -1609,7 +1625,205 @@ $(document).ready(function() {
         }
     });
 
-    // END SLIDER
+    // END GRID IMAGES
+
+    // BEGIN Four Grid Images
+
+    B.Editor.Collection.FourGridImages = B.Editor.Collection.extend({});
+    B.Editor.Model.FourGridImage = B.Editor.Model.extend({
+        defaults: function() {
+            return {
+                background_image: '',
+                section_link: '',
+                img_alt: '',
+                header: '',
+                paragraph: '',
+                section_heading: ''
+            };
+        }
+    });
+
+    B.Output.Collection.FourGridImages = B.Output.Collection.extend({});
+    B.Output.Model.FourGridImage = B.Output.Model.extend({});
+
+    B.Editor.View.FourGridImages = B.Editor.View.extend({
+        events: {
+            'click a.add_image': 'add_image',
+            'click a.insert_four_grid': 'render_output',
+            'keyup input.section_heading': 'save_section_heading',
+            'keyup textarea.section_paragraph': 'save_section_paragraph',
+            'keyup input.section_cta': 'save_section_cta',
+            'keyup input.section_cta_link': 'save_section_cta_link',
+            'paste .four_grid .editable': 'handle_paste'
+        },
+        template: _.template($('#FourGridImages').html()),
+        render: function() {
+            var heading = '';
+            var paragraph = '';
+            var cta = '';
+            var cta_link = '';
+
+            if (this.collection && this.collection.models.length > 0) {
+                heading = this.collection.at(0).get('section_heading');
+                paragraph = this.collection.at(0).get('section_paragraph');
+                cta = this.collection.at(0).get('section_cta');
+                cta_link = this.collection.at(0).get('section_cta_link');
+            }
+
+            this.$el.html(
+                this.template({
+                    section_heading: heading,
+                    section_paragraph: paragraph,
+                    section_cta: cta,
+                    section_cta_link: cta_link
+                })
+            );
+            this.add_all();
+            this.delegateEvents();
+        },
+        add_one: function(image) {
+            var quickGridImageModel = new B.Editor.Model.FourGridImage();
+            image.set(_.extend(quickGridImageModel.defaults(), image.attributes));
+            quickGridImageModel.destroy();
+
+            fourGridImageView = new B.Editor.View.FourGridImage({model: image});
+            this.$el.find('#four_grid_image_region').append(fourGridImageView.render());
+            featuredImageView = new B.Editor.View.FeaturedImageView({
+                model: fourGridImageView.model,
+                el: fourGridImageView.$el.find('.four_grid_image_region')
+            });
+            featuredImageView.render();
+        },
+        add_all: function() {
+            this.collection.forEach(this.add_one, this);
+        },
+        add_image: function() {
+            if (this.collection.length < 4) {
+                defaults = {
+                    background_image: '',
+                    section_link: '',
+                    img_alt: '',
+                    header: '',
+                    paragraph: '',
+                    section_heading: '',
+                    section_paragraph: '',
+                    section_cta: '',
+                    section_cta_link: ''
+                };
+                fourGridImageModel = new B.Editor.Model.FourGridImage(defaults);
+                this.collection.add(fourGridImageModel);
+                this.add_one(fourGridImageModel);
+            } else {
+                alert(
+                    'You can add up to 4 images. If you want more, just create another grid section.'
+                );
+            }
+        },
+        // to keep from having to make 2 more views
+        // Just save this to every model
+        save_section_heading: function(e) {
+            this.section_heading = $(e.currentTarget).val();
+            this.collection.forEach(this.set_model_section_heading, this);
+        },
+        set_model_section_heading: function(model) {
+            model.set('section_heading', this.section_heading);
+        },
+        save_section_paragraph: function(e) {
+            this.section_paragraph = $(e.currentTarget).val();
+            this.collection.forEach(this.set_model_section_paragraph, this);
+        },
+        set_model_section_paragraph: function(model) {
+            model.set('section_paragraph', this.section_paragraph);
+        },
+        save_section_cta: function(e) {
+            this.section_cta = $(e.currentTarget).val();
+            this.collection.forEach(this.set_model_section_cta, this);
+        },
+        set_model_section_cta: function(model) {
+            model.set('section_cta', this.section_cta);
+        },
+        save_section_cta_link: function(e) {
+            this.section_cta_link = $(e.currentTarget).val();
+            this.collection.forEach(this.set_model_section_cta_link, this);
+        },
+        set_model_section_cta_link: function(model) {
+            model.set('section_cta_link', this.section_cta_link);
+        },
+        render_output: function() {
+            if (this.test_json_encode_decode(fourGridImagesView.collection.toJSON())) {
+                fourGridImagesCollectionOutput = new B.Output.Collection.FourGridImages();
+                fourGridImagesCollectionOutput.reset(fourGridImagesView.collection.toJSON());
+                fourGridImagesViewOutput = new B.Output.View.FourGridImages({
+                    collection: fourGridImagesCollectionOutput
+                });
+                this.render_to_preview(fourGridImagesViewOutput.render().html());
+            }
+        }
+    });
+    B.Editor.View.FourGridImage = B.Editor.View.FourGridImages.extend({
+        events: {
+            'keyup .four_grid_form input.editable': 'update_model',
+            'keyup .four_grid_form textarea.editable': 'update_model',
+            'change .four_grid_form select.editable': 'update_model',
+            'click a.delete_grid': 'delete_grid'
+        },
+        template: _.template($('#FourGridImage').html()),
+        render: function() {
+            this.$el.html(this.template(this.model.attributes));
+
+            return this.$el;
+        },
+        delete_grid: function() {
+            this.model.destroy();
+            this.remove();
+        }
+    });
+
+    B.Output.View.FourGridImages = B.Output.View.extend({
+        initialize: function() {},
+        template: _.template($('#FourGridImagesOutput').html()),
+        render: function() {
+            this.section_heading = this.collection.at(0).get('section_heading');
+            this.section_paragraph = this.collection.at(0).get('section_paragraph');
+            this.section_cta = this.collection.at(0).get('section_cta');
+            this.section_cta_link = this.collection.at(0).get('section_cta_link');
+            this.$el.html(
+                this.template({
+                    section_heading: this.section_heading,
+                    section_paragraph: this.section_paragraph,
+                    section_cta: this.section_cta,
+                    section_cta_link: this.section_cta_link,
+                    model_json: JSON.stringify(this.collection.toJSON())
+                })
+            );
+            this.add_all();
+            return this.$el;
+        },
+        add_one: function(column, index) {
+            fourGridImageViewOutput = new B.Output.View.FourGridImage({
+                model: column,
+                className: 'col-sm-6 col-md-6'
+            });
+            this.$el.find('.four_grid_images_region').append(fourGridImageViewOutput.render());
+            if (index % 2) {
+                this.$el
+                    .find('.four_grid_images_region')
+                    .append('<div style="width:100%; clear:both;"></div>');
+            }
+        },
+        add_all: function() {
+            this.collection.forEach(this.add_one, this);
+        }
+    });
+
+    B.Output.View.FourGridImage = B.Output.View.FourGridImages.extend({
+        template: _.template($('#FourGridImageOutput').html()),
+        render: function() {
+            return this.$el.html(this.template(this.model.attributes));
+        }
+    });
+
+    // END Four Grid Images
 
     // BEGIN QUICK LINKS
     B.Editor.Collection.QuickLinkColumns = B.Editor.Collection.extend({});
