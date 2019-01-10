@@ -21,6 +21,17 @@
 				<textarea class="form-control editable" name="subheader"><%= subheader %></textarea>
 			</div>
 		</div>
+        <div class="row">
+            <div class="col-sm-12">
+                <label>Subheading Text Background</label>
+                <select class="form-control editable" name="subheading_background">
+                    <option <%= subheading_background == 'rgba(0,0,0,0)' ? 'selected' : '' %> value="rgba(0,0,0,0)">transparent</option>
+                    <option <%= subheading_background == 'rgba(0,0,0,.25)' ? 'selected' : '' %> value="rgba(0,0,0,.25)">25% transparent</option>
+                    <option <%= subheading_background == 'rgba(0,0,0,.5)' ? 'selected' : '' %> value="rgba(0,0,0,.5)">50% transparent</option>
+                    <option <%= subheading_background == 'rgba(0,0,0,.75)' ? 'selected' : '' %> value="rgba(0,0,0,.75)">75% transparent</option>
+                </select>
+            </div>
+        </div>
 		<div class="row">
 			<div class="col-sm-6">
 				<h3>Call to Action</h3>
@@ -81,7 +92,7 @@
             <div class="cont">
                 <div class="container text-center">
                     <h2><%= header %></h2>
-                    <p class="marker"><%= subheader %></p>
+                    <p class="marker" style="background: <%= subheading_background %>"><%= subheader %></p>
                     <a href="<%= cta_link %>" class="btn btn-primary"><%= cta_text %></a>
                 </div>
             </div>

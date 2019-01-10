@@ -655,6 +655,7 @@ $(document).ready(function() {
         defaults: {
             header: 'Headline',
             subheader: 'A specific headline',
+            subheading_background: 'rgba(0,0,0,0)',
             cta_text: 'CTA Text',
             cta_link: 'CTA link',
             background_image: ''
