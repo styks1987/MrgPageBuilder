@@ -187,7 +187,9 @@ $(document).ready(function() {
                 case 'home_rotator':
                     if (typeof homeRotatorView == 'undefined') {
                         homeRotatorCollection = new B.Editor.Collection.HomeRotator();
+                        homeRotatorModel = new B.Editor.Model.HomeRotator();
                         homeRotatorView = new B.Editor.View.HomeRotator({
+                            model: homeRotatorModel,
                             collection: homeRotatorCollection,
                             el: '#input_region'
                         });
@@ -195,7 +197,12 @@ $(document).ready(function() {
                         homeRotatorView.setElement('#input_region');
                     }
                     if (typeof data != 'undefined') {
-                        homeRotatorCollection.reset(data);
+                        if (typeof data['collection'] != 'undefined') {
+                            homeRotatorCollection.reset(data['collection']);
+                            homeRotatorModel.set(data['model']);
+                        } else {
+                            homeRotatorCollection.reset(data);
+                        }
                     }
                     homeRotatorView.render();
                     break;
@@ -2086,6 +2093,20 @@ $(document).ready(function() {
 
     // BEGIN HOME ROTATOR
     B.Editor.Collection.HomeRotator = B.Editor.Collection.extend({});
+    B.Editor.Model.HomeRotator = B.Editor.Model.extend({
+        defaults: function() {
+            return {
+                background_image: '',
+                section_link: '',
+                img_alt: '',
+                header: '',
+                paragraph: '',
+                section_heading: '',
+                section_subheading: '',
+                section_cta: ''
+            };
+        }
+    });
     B.Editor.Model.HomeImage = B.Editor.Model.extend({
         defaults: function() {
             return {
@@ -2102,28 +2123,19 @@ $(document).ready(function() {
     });
 
     B.Output.Collection.HomeRotator = B.Output.Collection.extend({});
+    B.Output.Model.HomeRotator = B.Output.Model.extend({});
     B.Output.Model.HomeImage = B.Output.Model.extend({});
 
     B.Editor.View.HomeRotator = B.Editor.View.extend({
         events: {
             'click a.add_image': 'add_image',
             'click a.insert_image': 'render_output',
-            'keyup input.section_heading': 'save_section_heading',
-            'keyup input.section_subheading': 'save_section_subheading',
-            'keyup input.section_link': 'save_section_link',
-            'keyup input.section_cta': 'save_section_cta',
+            'keyup input': 'update_model',
             'paste .home_rotator .editable': 'handle_paste'
         },
         template: _.template($('#HomeRotator').html()),
         render: function() {
-            this.$el.html(
-                this.template({
-                    section_heading: '',
-                    section_subheading: '',
-                    section_link: '',
-                    section_cta: ''
-                })
-            );
+            this.$el.html(this.template(this.model.attributes));
             this.add_all();
             this.delegateEvents();
         },
@@ -2161,42 +2173,13 @@ $(document).ready(function() {
                 alert('You can add up to 4 images.');
             }
         },
-        // to keep from having to make 2 more views
-        // Just save this to every model
-        save_section_heading: function(e) {
-            this.section_heading = $(e.currentTarget).val();
-            this.collection.forEach(this.set_model_section_heading, this);
-        },
-        set_model_section_heading: function(model) {
-            model.set('section_heading', this.section_heading);
-        },
-        save_section_subheading: function(e) {
-            this.section_subheading = $(e.currentTarget).val();
-            this.collection.forEach(this.set_model_section_subheading, this);
-        },
-        set_model_section_subheading: function(model) {
-            model.set('section_subheading', this.section_subheading);
-        },
-        save_section_link: function(e) {
-            this.section_link = $(e.currentTarget).val();
-            this.collection.forEach(this.set_model_section_link, this);
-        },
-        set_model_section_link: function(model) {
-            model.set('section_link', this.section_link);
-        },
-        save_section_cta: function(e) {
-            this.section_cta = $(e.currentTarget).val();
-            this.collection.forEach(this.set_model_section_cta, this);
-        },
-        set_model_section_cta: function(model) {
-            model.set('section_cta', this.section_cta);
-        },
         render_output: function() {
             if (this.test_json_encode_decode(homeRotatorView.collection.toJSON())) {
                 homeRotatorCollectionOutput = new B.Output.Collection.HomeRotator();
                 homeRotatorCollectionOutput.reset(homeRotatorView.collection.toJSON());
                 homeRotatorViewOutput = new B.Output.View.HomeRotator({
-                    collection: homeRotatorCollectionOutput
+                    collection: homeRotatorCollectionOutput,
+                    model: this.model
                 });
                 this.render_to_preview(homeRotatorViewOutput.render().html());
             }
@@ -2237,17 +2220,16 @@ $(document).ready(function() {
         initialize: function() {},
         template: _.template($('#OutputHomeRotator').html()),
         render: function() {
-            this.section_heading = this.collection.at(0).get('section_heading');
-            this.section_subheading = this.collection.at(0).get('section_subheading');
-            this.section_link = this.collection.at(0).get('section_link');
-            this.section_cta = this.collection.at(0).get('section_cta');
             this.$el.html(
                 this.template({
-                    section_heading: this.section_heading,
-                    section_subheading: this.section_subheading,
-                    section_link: this.section_link,
-                    section_cta: this.section_cta,
-                    model_json: JSON.stringify(this.collection.toJSON())
+                    section_heading: this.model.get('section_heading'),
+                    section_subheading: this.model.get('section_subheading'),
+                    section_link: this.model.get('section_link'),
+                    section_cta: this.model.get('section_cta'),
+                    model_json: JSON.stringify({
+                        collection: this.collection.toJSON(),
+                        model: this.model.toJSON()
+                    })
                 })
             );
             this.add_all();
